@@ -262,6 +262,7 @@ const soundFX = {
 // ==========================================
 window.addEventListener('DOMContentLoaded', () => {
   loadAppData();
+  renderMatrixCalendarHeaders();
   renderMatrixTable();
   initDonutCharts();
   initSecondaryCharts();
@@ -493,7 +494,7 @@ function interactWithMascot() {
 }
 
 // ==========================================
-// 7. MATRIX SPREADSHEET TABLE LOGIC
+// 7. MATRIX SPREADSHEET TABLE & CALENDAR LOGIC
 // ==========================================
 function getWeekInfo(day) {
   if (day <= 7) return { week: 1, class: 'w1-check' };
@@ -503,18 +504,101 @@ function getWeekInfo(day) {
   return { week: 5, class: 'w5-check' };
 }
 
+// Dynamically Render Days of the Week and Day Numbers Based on Actual Calendar Month & Year
+function renderMatrixCalendarHeaders() {
+  const mSelect = document.getElementById('monthSelect');
+  const ySelect = document.getElementById('yearSelect');
+  const month = mSelect ? parseInt(mSelect.value) : 10;
+  const year = ySelect ? parseInt(ySelect.value) : 2026;
+
+  const daysNumRow = document.getElementById('daysNumberHeaderRow');
+  const daysOfWeekRow = document.getElementById('daysOfWeekHeaderRow');
+  if (!daysNumRow || !daysOfWeekRow) return;
+
+  const realNow = new Date();
+  const isCurrentMonthAndYear = (realNow.getMonth() === month && realNow.getFullYear() === year);
+  const todayDay = isCurrentMonthAndYear ? realNow.getDate() : -1;
+
+  // Actual days in the selected month
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const shortDays = ['Su', 'M', 'Tu', 'W', 'Th', 'F', 'Sa'];
+  const fullDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+  let numHtml = '';
+  let weekHtml = '<th class="p-1.5 text-left pl-3 text-slate-400 font-normal">Day of Week</th>';
+
+  for (let d = 1; d <= 31; d++) {
+    const wInfo = getWeekInfo(d);
+    const borderRight = (d === 7 || d === 14 || d === 21 || d === 28 || d === 31) 
+      ? 'border-r-2 border-white/10' 
+      : 'border-r border-white/5';
+    
+    const isValidDay = (d <= daysInMonth);
+    const isToday = (d === todayDay);
+
+    const dateObj = new Date(year, month, d);
+    const dayOfWeekIdx = dateObj.getDay();
+    const dayAbbr = shortDays[dayOfWeekIdx];
+    const dayFull = fullDays[dayOfWeekIdx];
+    const isWeekend = (dayOfWeekIdx === 0 || dayOfWeekIdx === 6);
+
+    const weekBgMap = {
+      1: { bg: 'bg-amber-950/40', text: 'text-amber-300', weekendText: 'text-amber-400' },
+      2: { bg: 'bg-sky-950/40', text: 'text-sky-300', weekendText: 'text-sky-400' },
+      3: { bg: 'bg-rose-950/40', text: 'text-rose-300', weekendText: 'text-rose-400' },
+      4: { bg: 'bg-emerald-950/40', text: 'text-emerald-300', weekendText: 'text-emerald-400' },
+      5: { bg: 'bg-purple-950/40', text: 'text-purple-300', weekendText: 'text-purple-400' }
+    };
+    const colorTheme = weekBgMap[wInfo.week];
+
+    // Number Row (Row 2)
+    if (!isValidDay) {
+      numHtml += `<th class="w-8 py-1.5 opacity-20 text-slate-600 ${borderRight}" title="Day ${d} (not in this month)">-</th>`;
+    } else if (isToday) {
+      numHtml += `<th class="w-8 py-1.5 bg-gradient-to-b from-indigo-600 to-purple-600 text-white font-black ring-2 ring-purple-400 shadow-lg shadow-purple-500/30 ${borderRight}" title="TODAY: Day ${d} (${dayFull})">${d}</th>`;
+    } else {
+      numHtml += `<th class="w-8 py-1.5 ${colorTheme.bg} ${colorTheme.text} ${borderRight}" title="Day ${d} (${dayFull})">${d}</th>`;
+    }
+
+    // Day of Week Row (Row 3)
+    if (!isValidDay) {
+      weekHtml += `<th class="opacity-20 text-slate-600 ${borderRight}">-</th>`;
+    } else if (isToday) {
+      weekHtml += `<th class="bg-indigo-600 text-white font-black ring-2 ring-purple-400 shadow-md ${borderRight}" title="TODAY: ${dayFull}">${dayAbbr}</th>`;
+    } else {
+      const textColor = isWeekend ? colorTheme.weekendText + ' font-bold' : 'text-slate-400';
+      weekHtml += `<th class="${textColor} ${borderRight}" title="${dayFull}">${dayAbbr}</th>`;
+    }
+  }
+
+  // Padding columns matching Goal, Progress, Action
+  weekHtml += '<th class="border-r border-white/10"></th><th class="border-r border-white/10"></th><th></th>';
+
+  daysNumRow.innerHTML = numHtml;
+  daysOfWeekRow.innerHTML = weekHtml;
+}
+
 function renderMatrixTable() {
   const tbody = document.getElementById('matrixTableBody');
   if (!tbody) return;
   tbody.innerHTML = '';
 
-  const todayDate = new Date().getDate();
+  const mSelect = document.getElementById('monthSelect');
+  const ySelect = document.getElementById('yearSelect');
+  const month = mSelect ? parseInt(mSelect.value) : 10;
+  const year = ySelect ? parseInt(ySelect.value) : 2026;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const realNow = new Date();
+  const isCurrentMonthAndYear = (realNow.getMonth() === month && realNow.getFullYear() === year);
+  const todayDay = isCurrentMonthAndYear ? realNow.getDate() : -1;
 
   habits.forEach((habit) => {
     const tr = document.createElement('tr');
     tr.className = "hover:bg-white/[0.03] transition-colors border-b border-white/5";
 
-    const completedCount = habit.days ? habit.days.length : 0;
+    const completedCount = habit.days ? habit.days.filter(d => d <= daysInMonth).length : 0;
     const progressPct = Math.min(100, Math.round((completedCount / (habit.goal || 30)) * 100));
 
     const catBadge = {
@@ -537,19 +621,29 @@ function renderMatrixTable() {
     for (let d = 1; d <= 31; d++) {
       const wInfo = getWeekInfo(d);
       const isChecked = habit.days && habit.days.includes(d);
-      const isToday = (d === todayDate);
+      const isToday = (d === todayDay);
+      const isValidDay = (d <= daysInMonth);
       const borderRight = (d === 7 || d === 14 || d === 21 || d === 28 || d === 31) 
         ? 'border-r-2 border-white/10' 
         : 'border-r border-white/5';
-      const todayBg = isToday ? 'bg-indigo-500/10' : '';
+      const todayBg = isToday ? 'bg-indigo-500/15' : '';
 
-      html += `
-        <td class="text-center p-1 ${borderRight} ${todayBg}">
-          <input type="checkbox" ${isChecked ? 'checked' : ''} 
-            onchange="toggleCell(${habit.id}, ${d})" 
-            class="cell-checkbox ${wInfo.class}">
-        </td>
-      `;
+      if (!isValidDay) {
+        html += `
+          <td class="text-center p-1 ${borderRight} opacity-20">
+            <span class="text-slate-600 font-mono text-[10px]">-</span>
+          </td>
+        `;
+      } else {
+        html += `
+          <td class="text-center p-1 ${borderRight} ${todayBg}">
+            <input type="checkbox" ${isChecked ? 'checked' : ''} 
+              onchange="toggleCell(${habit.id}, ${d})" 
+              class="cell-checkbox ${wInfo.class}"
+              title="Day ${d}">
+          </td>
+        `;
+      }
     }
 
     // Goal Column
@@ -639,9 +733,14 @@ function deleteHabit(habitId) {
 function changeCalendarMonth() {
   const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const m = parseInt(document.getElementById('monthSelect').value);
-  const y = document.getElementById('yearSelect').value;
+  const y = parseInt(document.getElementById('yearSelect').value);
   const banner = document.getElementById('matrixBannerTitle');
   if (banner) banner.innerText = `(${monthNames[m]}) ${y} Habit & Skill Mastery Tracker`;
+
+  renderMatrixCalendarHeaders();
+  renderMatrixTable();
+  updateAllCalculationsAndCharts();
+  runLoopholeAudit();
 }
 
 // Modal Handlers
@@ -682,10 +781,16 @@ function updateAllCalculationsAndCharts() {
   const totalHabitsCount = habits.length;
   const dailyDone = new Array(32).fill(0);
 
+  const mSelect = document.getElementById('monthSelect');
+  const ySelect = document.getElementById('yearSelect');
+  const month = mSelect ? parseInt(mSelect.value) : 10;
+  const year = ySelect ? parseInt(ySelect.value) : 2026;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
   habits.forEach(h => {
     if (h.days) {
       h.days.forEach(d => {
-        if (d >= 1 && d <= 31) dailyDone[d]++;
+        if (d >= 1 && d <= daysInMonth) dailyDone[d]++;
       });
     }
   });
@@ -699,14 +804,21 @@ function updateAllCalculationsAndCharts() {
   let grandIncompleteSum = 0;
 
   for (let d = 1; d <= 31; d++) {
-    const done = dailyDone[d];
-    const incomplete = Math.max(0, totalHabitsCount - done);
-    grandDoneSum += done;
-    grandIncompleteSum += incomplete;
-
+    const isValidDay = (d <= daysInMonth);
     const border = (d === 7 || d === 14 || d === 21 || d === 28 || d === 31) ? 'border-r-2 border-white/10' : 'border-r border-white/5';
-    if (completedRow) completedRow.innerHTML += `<div class="py-1 ${border}">${done}</div>`;
-    if (incompleteRow) incompleteRow.innerHTML += `<div class="py-1 ${border}">${incomplete}</div>`;
+
+    if (!isValidDay) {
+      if (completedRow) completedRow.innerHTML += `<div class="py-1 opacity-20 text-slate-600 ${border}">-</div>`;
+      if (incompleteRow) incompleteRow.innerHTML += `<div class="py-1 opacity-20 text-slate-600 ${border}">-</div>`;
+    } else {
+      const done = dailyDone[d];
+      const incomplete = Math.max(0, totalHabitsCount - done);
+      grandDoneSum += done;
+      grandIncompleteSum += incomplete;
+
+      if (completedRow) completedRow.innerHTML += `<div class="py-1 ${border}">${done}</div>`;
+      if (incompleteRow) incompleteRow.innerHTML += `<div class="py-1 ${border}">${incomplete}</div>`;
+    }
   }
 
   const grandDoneEl = document.getElementById('grandTotalCompleted');
@@ -715,18 +827,19 @@ function updateAllCalculationsAndCharts() {
   if (grandIncompEl) grandIncompEl.innerText = grandIncompleteSum;
 
   // Weekly Sums
-  const w1Done = sumDays(dailyDone, 1, 7);
-  const w2Done = sumDays(dailyDone, 8, 14);
-  const w3Done = sumDays(dailyDone, 15, 21);
-  const w4Done = sumDays(dailyDone, 22, 28);
-  const w5Done = sumDays(dailyDone, 29, 31);
+  const w1Done = sumDays(dailyDone, 1, Math.min(7, daysInMonth));
+  const w2Done = sumDays(dailyDone, 8, Math.min(14, daysInMonth));
+  const w3Done = sumDays(dailyDone, 15, Math.min(21, daysInMonth));
+  const w4Done = sumDays(dailyDone, 22, Math.min(28, daysInMonth));
+  const w5Done = sumDays(dailyDone, 29, Math.min(31, daysInMonth));
 
   const w1Max = totalHabitsCount * 7;
   const w2Max = totalHabitsCount * 7;
   const w3Max = totalHabitsCount * 7;
   const w4Max = totalHabitsCount * 7;
-  const w5Max = totalHabitsCount * 3;
-  const grandMax = totalHabitsCount * 31;
+  const w5ValidDays = Math.max(0, Math.min(31, daysInMonth) - 28);
+  const w5Max = totalHabitsCount * w5ValidDays;
+  const grandMax = totalHabitsCount * daysInMonth;
 
   setElText('w1CompletedSum', w1Done);
   setElText('w1IncompleteSum', Math.max(0, w1Max - w1Done));
@@ -931,17 +1044,33 @@ function runLoopholeAudit() {
   if (!container) return;
   container.innerHTML = '';
 
-  const weekends = [6, 7, 13, 14, 20, 21, 27, 28];
+  const mSelect = document.getElementById('monthSelect');
+  const ySelect = document.getElementById('yearSelect');
+  const month = mSelect ? parseInt(mSelect.value) : 10;
+  const year = ySelect ? parseInt(ySelect.value) : 2026;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  // Dynamically calculate actual Saturday & Sunday calendar dates
+  const weekends = [];
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dayOfWeek = new Date(year, month, d).getDay();
+    if (dayOfWeek === 0 || dayOfWeek === 6) { // 0 = Sunday, 6 = Saturday
+      weekends.push(d);
+    }
+  }
+
   let weekendDone = 0;
   let weekendTotal = weekends.length * habits.length;
   let weekdayDone = 0;
-  let weekdayTotal = (31 - weekends.length) * habits.length;
+  let weekdayTotal = (daysInMonth - weekends.length) * habits.length;
 
   habits.forEach(h => {
     if (h.days) {
       h.days.forEach(d => {
-        if (weekends.includes(d)) weekendDone++;
-        else weekdayDone++;
+        if (d <= daysInMonth) {
+          if (weekends.includes(d)) weekendDone++;
+          else weekdayDone++;
+        }
       });
     }
   });
@@ -971,7 +1100,8 @@ function runLoopholeAudit() {
   let lowestHabit = null;
   let lowestRatio = 1.0;
   habits.forEach(h => {
-    const ratio = (h.days ? h.days.length : 0) / (h.goal || 25);
+    const validCount = h.days ? h.days.filter(d => d <= daysInMonth).length : 0;
+    const ratio = validCount / (h.goal || 25);
     if (ratio < lowestRatio) {
       lowestRatio = ratio;
       lowestHabit = h;

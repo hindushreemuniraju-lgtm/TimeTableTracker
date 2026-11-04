@@ -325,67 +325,14 @@
                 </th>
               </tr>
 
-              <!-- Row 2: Days Numbers 1-31 -->
-              <tr class="text-center font-mono text-[11px] font-bold border-b border-white/10">
-                <!-- Week 1 Days (1-7) -->
-                <th class="w-8 py-1.5 bg-amber-950/40 text-amber-300 border-r border-white/5">1</th>
-                <th class="w-8 py-1.5 bg-amber-950/40 text-amber-300 border-r border-white/5">2</th>
-                <th class="w-8 py-1.5 bg-amber-950/40 text-amber-300 border-r border-white/5">3</th>
-                <th class="w-8 py-1.5 bg-amber-950/40 text-amber-300 border-r border-white/5">4</th>
-                <th class="w-8 py-1.5 bg-amber-950/40 text-amber-300 border-r border-white/5">5</th>
-                <th class="w-8 py-1.5 bg-amber-950/40 text-amber-300 border-r border-white/5">6</th>
-                <th class="w-8 py-1.5 bg-amber-950/40 text-amber-300 border-r border-white/10">7</th>
-
-                <!-- Week 2 Days (8-14) -->
-                <th class="w-8 py-1.5 bg-sky-950/40 text-sky-300 border-r border-white/5">8</th>
-                <th class="w-8 py-1.5 bg-sky-950/40 text-sky-300 border-r border-white/5">9</th>
-                <th class="w-8 py-1.5 bg-sky-950/40 text-sky-300 border-r border-white/5">10</th>
-                <th class="w-8 py-1.5 bg-sky-950/40 text-sky-300 border-r border-white/5">11</th>
-                <th class="w-8 py-1.5 bg-sky-950/40 text-sky-300 border-r border-white/5">12</th>
-                <th class="w-8 py-1.5 bg-sky-950/40 text-sky-300 border-r border-white/5">13</th>
-                <th class="w-8 py-1.5 bg-sky-950/40 text-sky-300 border-r border-white/10">14</th>
-
-                <!-- Week 3 Days (15-21) -->
-                <th class="w-8 py-1.5 bg-rose-950/40 text-rose-300 border-r border-white/5">15</th>
-                <th class="w-8 py-1.5 bg-rose-950/40 text-rose-300 border-r border-white/5">16</th>
-                <th class="w-8 py-1.5 bg-rose-950/40 text-rose-300 border-r border-white/5">17</th>
-                <th class="w-8 py-1.5 bg-rose-950/40 text-rose-300 border-r border-white/5">18</th>
-                <th class="w-8 py-1.5 bg-rose-950/40 text-rose-300 border-r border-white/5">19</th>
-                <th class="w-8 py-1.5 bg-rose-950/40 text-rose-300 border-r border-white/5">20</th>
-                <th class="w-8 py-1.5 bg-rose-950/40 text-rose-300 border-r border-white/10">21</th>
-
-                <!-- Week 4 Days (22-28) -->
-                <th class="w-8 py-1.5 bg-emerald-950/40 text-emerald-300 border-r border-white/5">22</th>
-                <th class="w-8 py-1.5 bg-emerald-950/40 text-emerald-300 border-r border-white/5">23</th>
-                <th class="w-8 py-1.5 bg-emerald-950/40 text-emerald-300 border-r border-white/5">24</th>
-                <th class="w-8 py-1.5 bg-emerald-950/40 text-emerald-300 border-r border-white/5">25</th>
-                <th class="w-8 py-1.5 bg-emerald-950/40 text-emerald-300 border-r border-white/5">26</th>
-                <th class="w-8 py-1.5 bg-emerald-950/40 text-emerald-300 border-r border-white/5">27</th>
-                <th class="w-8 py-1.5 bg-emerald-950/40 text-emerald-300 border-r border-white/10">28</th>
-
-                <!-- Week 5 Days (29-31) -->
-                <th class="w-8 py-1.5 bg-purple-950/40 text-purple-300 border-r border-white/5">29</th>
-                <th class="w-8 py-1.5 bg-purple-950/40 text-purple-300 border-r border-white/5">30</th>
-                <th class="w-8 py-1.5 bg-purple-950/40 text-purple-300 border-r border-white/10">31</th>
+              <!-- Row 2: Days Numbers 1-31 (Dynamically synchronized with calendar month) -->
+              <tr id="daysNumberHeaderRow" class="text-center font-mono text-[11px] font-bold border-b border-white/10">
+                <!-- Injected and updated dynamically by JS based on actual month/year -->
               </tr>
 
-              <!-- Row 3: Days of Week (M, T, W, Th, F, Sa, Su) -->
-              <tr class="text-center text-[10px] uppercase font-mono text-slate-400 bg-brand-950/80 border-b border-white/10">
-                <th class="p-1.5 text-left pl-3 text-slate-400 font-normal">Day of Week</th>
-                <th class="border-r border-white/5">M</th><th class="border-r border-white/5">T</th><th class="border-r border-white/5">W</th>
-                <th class="border-r border-white/5">T</th><th class="border-r border-white/5">F</th><th class="border-r border-white/5 text-amber-400">S</th><th class="border-r border-white/10 text-amber-400">S</th>
-
-                <th class="border-r border-white/5">M</th><th class="border-r border-white/5">T</th><th class="border-r border-white/5">W</th>
-                <th class="border-r border-white/5">T</th><th class="border-r border-white/5">F</th><th class="border-r border-white/5 text-sky-400">S</th><th class="border-r border-white/10 text-sky-400">S</th>
-
-                <th class="border-r border-white/5">M</th><th class="border-r border-white/5">T</th><th class="border-r border-white/5">W</th>
-                <th class="border-r border-white/5">T</th><th class="border-r border-white/5">F</th><th class="border-r border-white/5 text-rose-400">S</th><th class="border-r border-white/10 text-rose-400">S</th>
-
-                <th class="border-r border-white/5">M</th><th class="border-r border-white/5">T</th><th class="border-r border-white/5">W</th>
-                <th class="border-r border-white/5">T</th><th class="border-r border-white/5">F</th><th class="border-r border-white/5 text-emerald-400">S</th><th class="border-r border-white/10 text-emerald-400">S</th>
-
-                <th class="border-r border-white/5">M</th><th class="border-r border-white/5">T</th><th class="border-r border-white/10">W</th>
-                <th class="border-r border-white/10"></th><th class="border-r border-white/10"></th><th></th>
+              <!-- Row 3: Days of Week (Dynamically synchronized with real calendar days) -->
+              <tr id="daysOfWeekHeaderRow" class="text-center text-[10px] uppercase font-mono text-slate-400 bg-brand-950/80 border-b border-white/10">
+                <!-- Injected and updated dynamically by JS based on actual month/year -->
               </tr>
             </thead>
 
