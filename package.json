@@ -2,10 +2,10 @@
   "name": "timetable-tracker",
   "version": "2.0.0",
   "description": "ChronoSprint Mastery & Habit Matrix - AI Timetable, Real-time Habit Matrix, Gated Video CheatNotes & Skill Recommendations",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js",
-    "build": "echo 'Static assets ready'"
+    "dev": "node server.js"
   },
   "keywords": [
     "habit-tracker",
