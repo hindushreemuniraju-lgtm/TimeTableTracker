@@ -24,6 +24,13 @@ function handler(req, res) {
   try {
     let parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
     let pathname = parsedUrl.pathname;
+
+    // Handle AI API endpoint
+    if (pathname === '/api/ai' || pathname === '/api/chat') {
+      const aiHandler = require('./api/ai.js');
+      return aiHandler(req, res);
+    }
+
     if (pathname === '/') {
       pathname = '/index.html';
     }

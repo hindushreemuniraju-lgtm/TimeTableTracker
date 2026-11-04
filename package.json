@@ -16,5 +16,8 @@
     "skill-recommendations"
   ],
   "author": "ChronoSprint Team",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@google/genai": "^2.32.0"
+  }
 }

@@ -3,26 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>ChronoSprint Mastery & Habit Matrix</title>
-  <meta name="description" content="Spreadsheet-Precision 31-Day Habit Tracker, ChatGPT-grade AI Timetable Synthesizer, Rotating YouTube Skill Recommendations & Gated Lecture CheatNotes">
+  <title>ChronoSprint - AI Timetable & Productivity Dashboard</title>
+  <meta name="description" content="AI-Powered Timetable Tracker, Task Management, Interactive Calendar, 31-Day Habit Matrix & Google Gemini Assistant">
 
   <!-- PWA Metadata & iOS Standalone Flags -->
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#060814">
+  <meta name="theme-color" content="#070915">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="ChronoSprint">
   <link rel="apple-touch-icon" href="icon-192.svg">
   <link rel="icon" type="image/svg+xml" href="icon-192.svg">
 
-  <!-- Tailwind CSS -->
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Chart.js -->
+  <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Phosphor Icons -->
+  <!-- Phosphor Icons CDN -->
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
-  <!-- Canvas Confetti -->
+  <!-- Canvas Confetti CDN -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
   <!-- Google Fonts: Inter & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -42,11 +43,12 @@
           },
           colors: {
             brand: {
-              950: '#060814',
-              900: '#0b0f24',
-              850: '#101633',
-              800: '#171e45',
-              700: '#222c63',
+              950: '#070915',
+              900: '#0c1024',
+              850: '#121735',
+              800: '#192047',
+              700: '#232c61',
+              600: '#34428a'
             },
             week1: { light: '#fef3c7', base: '#f59e0b', dark: '#b45309', border: '#d97706' },
             week2: { light: '#e0f2fe', base: '#0284c7', dark: '#0369a1', border: '#0284c7' },
@@ -59,25 +61,37 @@
     }
   </script>
 </head>
-<body class="min-h-screen text-slate-100 flex flex-col font-sans bg-[#070915] selection:bg-purple-600/30 selection:text-purple-300 pb-16 lg:pb-0">
+<body class="min-h-screen text-slate-100 flex flex-col font-sans bg-[#070915] selection:bg-indigo-600/30 selection:text-indigo-300 pb-20 lg:pb-6">
 
-  <!-- TOP APP STATUS & CONTROL HEADER -->
+  <!-- ==================================================== -->
+  <!-- TOAST NOTIFICATION CONTAINER (Instant Feedback)      -->
+  <!-- ==================================================== -->
+  <div id="toastNotification" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 hidden transition-all duration-300 pointer-events-none">
+    <div class="px-4 py-2.5 rounded-xl glass-panel-elevated bg-brand-900 border border-indigo-500/40 text-xs sm:text-sm font-semibold text-white shadow-2xl flex items-center gap-2.5">
+      <span id="toastIcon" class="text-base text-emerald-400"><i class="ph-bold ph-check-circle"></i></span>
+      <span id="toastMessage">Action completed successfully!</span>
+    </div>
+  </div>
+
+  <!-- ==================================================== -->
+  <!-- TOP APP STATUS & CONTROL HEADER                      -->
+  <!-- ==================================================== -->
   <header class="sticky top-0 z-40 border-b border-white/10 glass-panel bg-opacity-90">
-    <div class="max-w-[1700px] mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
+    <div class="max-w-[1700px] mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
       
       <!-- Brand & Mascot Intro -->
-      <div class="flex items-center gap-2.5 sm:gap-3 cursor-pointer" onclick="switchView('matrix')">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/20 flex-shrink-0">
-          <i class="ph-bold ph-table text-2xl text-white"></i>
+      <div class="flex items-center gap-2.5 sm:gap-3 cursor-pointer" onclick="switchView('dashboard')">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/25 flex-shrink-0">
+          <i class="ph-bold ph-calendar-check text-2xl text-white"></i>
         </div>
         <div>
           <div class="flex items-center gap-1.5">
             <h1 class="text-base sm:text-lg font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-200 to-purple-400">
               ChronoSprint
             </h1>
-            <span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">APP v2</span>
+            <span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">PRO</span>
           </div>
-          <p class="text-[10px] text-slate-400 hidden sm:block">Real-time Matrix • AI Timetable • Gated CheatNotes</p>
+          <p class="text-[10px] text-slate-400 hidden sm:block">AI Timetable • Task Manager • Productivity Matrix</p>
         </div>
       </div>
 
@@ -88,55 +102,32 @@
           <span id="realtimeClock" class="font-bold">00:00:00</span>
         </div>
         <span class="text-white/20">|</span>
-        <span id="currentDayBadge" class="text-purple-300 font-semibold">Today: Day --</span>
+        <span id="headerTodayDate" class="text-purple-300 font-semibold">Today</span>
       </div>
 
       <!-- Actions & Global Modals -->
-      <div class="flex items-center gap-1.5 sm:gap-2">
-        <!-- Month & Year Controls -->
-        <div class="flex items-center bg-brand-900 border border-white/10 rounded-xl p-0.5 text-xs">
-          <select id="monthSelect" onchange="changeCalendarMonth()" class="bg-transparent text-slate-200 font-semibold px-2 py-1 focus:outline-none cursor-pointer text-xs">
-            <option value="0" class="bg-brand-950">Jan</option>
-            <option value="1" class="bg-brand-950">Feb</option>
-            <option value="2" class="bg-brand-950">Mar</option>
-            <option value="3" class="bg-brand-950">Apr</option>
-            <option value="4" class="bg-brand-950">May</option>
-            <option value="5" class="bg-brand-950">Jun</option>
-            <option value="6" class="bg-brand-950">Jul</option>
-            <option value="7" class="bg-brand-950">Aug</option>
-            <option value="8" class="bg-brand-950">Sep</option>
-            <option value="9" class="bg-brand-950">Oct</option>
-            <option value="10" class="bg-brand-950" selected>Nov</option>
-            <option value="11" class="bg-brand-950">Dec</option>
-          </select>
-          <span class="text-white/20">|</span>
-          <select id="yearSelect" onchange="changeCalendarMonth()" class="bg-transparent text-slate-200 font-semibold px-1.5 py-1 focus:outline-none cursor-pointer text-xs">
-            <option value="2025" class="bg-brand-950">2025</option>
-            <option value="2026" class="bg-brand-950" selected>2026</option>
-            <option value="2027" class="bg-brand-950">2027</option>
-          </select>
-        </div>
-
+      <div class="flex items-center gap-2">
         <!-- Install PWA App Button -->
         <button id="installAppBtn" onclick="triggerPWAInstall()" class="hidden px-2.5 py-1.5 text-xs font-bold rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:brightness-110 active:scale-95 transition-all text-white shadow-md flex items-center gap-1">
           <i class="ph-bold ph-download-simple"></i>
           <span class="hidden sm:inline">Install App</span>
         </button>
 
-        <!-- AI API Key Settings -->
-        <button onclick="openApiKeyModal()" title="Configure Custom Gemini / OpenAI API Key" class="p-2 rounded-xl bg-brand-900 border border-white/10 text-purple-300 hover:text-white hover:bg-purple-900/30 transition-all text-sm">
-          <i class="ph-bold ph-key"></i>
-        </button>
-
-        <!-- Add Habit Button -->
-        <button onclick="openAddHabitModal()" class="px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:brightness-110 active:scale-95 transition-all text-white shadow-md flex items-center gap-1.5">
+        <!-- Global + Add Task Button -->
+        <button onclick="openAddTaskModal()" class="px-3.5 py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:brightness-110 active:scale-95 transition-all text-white shadow-lg shadow-indigo-600/25 flex items-center gap-1.5">
           <i class="ph-bold ph-plus-circle text-base"></i>
-          <span class="hidden md:inline">Add Habit</span>
+          <span>Add Task</span>
         </button>
 
-        <!-- Reset / Preset Button -->
-        <button onclick="loadSamplePresets()" title="Load High-Performers Template" class="p-2 rounded-xl bg-brand-900 border border-white/10 text-slate-400 hover:text-white transition-all text-sm">
-          <i class="ph-bold ph-arrows-clockwise"></i>
+        <!-- AI Assistant Shortcut -->
+        <button onclick="switchView('ai')" title="Open Astra AI Assistant" class="p-2 rounded-xl bg-brand-900 border border-white/10 text-purple-300 hover:text-white hover:bg-purple-900/30 transition-all text-sm flex items-center gap-1">
+          <i class="ph-bold ph-sparkle text-base text-purple-400"></i>
+          <span class="hidden lg:inline text-xs font-semibold">Astra AI</span>
+        </button>
+
+        <!-- Settings Shortcut -->
+        <button onclick="switchView('settings')" title="Settings & Data Management" class="p-2 rounded-xl bg-brand-900 border border-white/10 text-slate-400 hover:text-white transition-all text-sm">
+          <i class="ph-bold ph-gear"></i>
         </button>
       </div>
 
@@ -155,35 +146,53 @@
     </div>
   </div>
 
-  <!-- MAIN APPLICATION NAVIGATION BAR (ACCESSIBLE ACROSS ALL SCREEN SIZES) -->
-  <nav class="flex bg-brand-900/70 border-b border-white/10 px-3 sm:px-6 py-2 items-center justify-between sticky top-16 z-30 backdrop-blur-md overflow-x-auto gap-2">
+  <!-- ==================================================== -->
+  <!-- MAIN APPLICATION NAVIGATION BAR (ALL SCREENS)        -->
+  <!-- ==================================================== -->
+  <nav class="flex bg-brand-900/80 border-b border-white/10 px-3 sm:px-6 py-2 items-center justify-between sticky top-16 z-30 backdrop-blur-md overflow-x-auto gap-2">
     <div class="flex items-center gap-1.5 overflow-x-auto text-xs min-w-max">
-      <button id="tabBtnMatrix" onclick="switchView('matrix')" class="px-3.5 py-1.5 rounded-lg font-semibold bg-indigo-600 text-white transition-all flex items-center gap-1.5 shadow-md shadow-indigo-600/30">
-        <i class="ph-bold ph-grid-four"></i> 31-Day Matrix & Donut Charts
+      <!-- 1. Dashboard -->
+      <button id="tabBtnDashboard" onclick="switchView('dashboard')" class="px-3.5 py-1.5 rounded-lg font-semibold bg-indigo-600 text-white transition-all flex items-center gap-1.5 shadow-md shadow-indigo-600/30">
+        <i class="ph-bold ph-squares-four text-base"></i> Dashboard
       </button>
+
+      <!-- 2. Timetable -->
+      <button id="tabBtnTimetable" onclick="switchView('timetable')" class="px-3.5 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5">
+        <i class="ph-bold ph-clock text-base text-sky-400"></i> My Timetable
+      </button>
+
+      <!-- 3. Tasks -->
+      <button id="tabBtnTasks" onclick="switchView('tasks')" class="px-3.5 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5">
+        <i class="ph-bold ph-check-square-offset text-base text-emerald-400"></i> Tasks
+        <span id="navPendingTaskCount" class="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-500/20 text-emerald-300 font-mono">0</span>
+      </button>
+
+      <!-- 4. Calendar -->
+      <button id="tabBtnCalendar" onclick="switchView('calendar')" class="px-3.5 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5">
+        <i class="ph-bold ph-calendar text-base text-amber-400"></i> Calendar
+      </button>
+
+      <!-- 5. AI Assistant -->
       <button id="tabBtnAI" onclick="switchView('ai')" class="px-3.5 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5">
-        <i class="ph-bold ph-sparkle text-purple-400"></i> Astra AI • Timetable & ChatGPT Assistant
+        <i class="ph-bold ph-sparkle text-base text-purple-400"></i> AI Assistant
       </button>
-      <button id="tabBtnVideos" onclick="switchView('videos')" class="px-3.5 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5">
-        <i class="ph-bold ph-youtube-logo text-red-400"></i> Skill Growth & YouTube Masterclasses
+
+      <!-- 6. Progress & Matrix -->
+      <button id="tabBtnProgress" onclick="switchView('progress')" class="px-3.5 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5">
+        <i class="ph-bold ph-chart-line-up text-base text-rose-400"></i> Progress & Matrix
       </button>
-      <button id="tabBtnPlayer" onclick="switchView('player')" class="px-3.5 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5">
-        <i class="ph-bold ph-file-text text-amber-400"></i> Lecture Studio & CheatNotes
-      </button>
-      <button id="tabBtnVault" onclick="switchView('vault')" class="px-3.5 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5">
-        <i class="ph-bold ph-bookmark-simple text-sky-400"></i> Saved Vault
-        <span id="vaultCountBadge" class="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-sky-500/20 text-sky-300 font-mono">0</span>
-      </button>
-      <button id="tabBtnGoals" onclick="switchView('goals')" class="px-3.5 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5">
-        <i class="ph-bold ph-target text-emerald-400"></i> Sprints & Milestones
+
+      <!-- 7. Settings & Vault -->
+      <button id="tabBtnSettings" onclick="switchView('settings')" class="px-3.5 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5">
+        <i class="ph-bold ph-gear text-base text-slate-400"></i> Settings & Vault
       </button>
     </div>
 
-    <!-- Quick Stats -->
+    <!-- Quick Stats in Nav -->
     <div class="hidden xl:flex items-center gap-4 text-xs font-mono flex-shrink-0">
-      <span class="text-slate-400">Target: <strong id="headerTotalGoal" class="text-white">180</strong></span>
-      <span class="text-slate-400">Achieved: <strong id="headerTotalDone" class="text-emerald-400">92</strong></span>
-      <span class="text-slate-400">Compliance: <strong id="headerTotalPct" class="text-purple-400">51.1%</strong></span>
+      <span class="text-slate-400">Pending: <strong id="headerPendingCount" class="text-amber-400">0</strong></span>
+      <span class="text-slate-400">Completed: <strong id="headerCompletedCount" class="text-emerald-400">0</strong></span>
+      <span class="text-slate-400">Completion: <strong id="headerRatePct" class="text-purple-400">0%</strong></span>
     </div>
   </nav>
 
@@ -191,7 +200,6 @@
   <!-- INTERACTIVE ANIMATED CHARACTER MASCOT (ASTRA) WIDGET -->
   <!-- ==================================================== -->
   <aside id="mascotCompanionWidget" class="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-40 flex items-end gap-3 pointer-events-auto select-none">
-    
     <!-- Speech Dialogue Bubble -->
     <div id="mascotSpeechBubble" class="speech-bubble max-w-xs glass-panel-elevated p-3 rounded-2xl border border-purple-500/30 text-xs text-slate-200 shadow-2xl relative hidden sm:block">
       Consistency is the only superpower that cannot be faked.
@@ -238,751 +246,792 @@
         <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500"></span>
       </span>
     </div>
-
   </aside>
 
   <!-- ==================================================== -->
-  <!-- MAIN APP VIEWPORTS CONTAINER                         -->
+  <!-- MAIN APP CONTENT PANELS (ROUTED VIEWS)              -->
   <!-- ==================================================== -->
-  <main class="flex-1 max-w-[1700px] w-full mx-auto px-2 sm:px-4 lg:px-8 py-5 space-y-8">
+  <main class="flex-1 max-w-[1700px] w-full mx-auto px-3 sm:px-6 lg:px-8 py-5">
 
-    <!-- ========================================== -->
-    <!-- VIEW 1: THE FULL MONTHLY MATRIX & DONUT DASH -->
-    <!-- ========================================== -->
-    <section id="viewMatrix" class="space-y-6">
-
-      <!-- Top Banner Header for Matrix -->
-      <div class="w-full bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 rounded-2xl p-4 sm:p-5 border border-white/10 shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
-        <div>
-          <span class="text-xs font-mono uppercase tracking-widest text-indigo-300">Active Cycle Matrix</span>
-          <h2 id="matrixBannerTitle" class="text-xl sm:text-2xl font-black text-white tracking-wide mt-0.5">
-            (November) 2026 Habit & Skill Mastery Tracker
+    <!-- ==================================================== -->
+    <!-- VIEW 1: EXECUTIVE DASHBOARD                          -->
+    <!-- ==================================================== -->
+    <section id="viewDashboard" class="space-y-6">
+      <!-- Welcome Banner -->
+      <div class="glass-panel-elevated rounded-2xl p-6 sm:p-8 border border-white/10 bg-gradient-to-r from-brand-900 via-indigo-950/40 to-brand-900 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-2xl relative overflow-hidden">
+        <div class="space-y-2 relative z-10">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-semibold">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span id="dashLiveTimeGreeting">Good Day</span>
+          </div>
+          <h2 id="dashWelcomeTitle" class="text-2xl sm:text-3xl font-black text-white tracking-tight">
+            Welcome to ChronoSprint
           </h2>
-        </div>
-        <div class="flex flex-wrap items-center gap-2 text-xs">
-          <div class="flex items-center gap-1.5 bg-black/40 px-3 py-1.5 rounded-lg border border-white/10">
-            <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Week 1 (1-7)
-          </div>
-          <div class="flex items-center gap-1.5 bg-black/40 px-3 py-1.5 rounded-lg border border-white/10">
-            <span class="w-2.5 h-2.5 rounded-full bg-sky-400"></span> Week 2 (8-14)
-          </div>
-          <div class="flex items-center gap-1.5 bg-black/40 px-3 py-1.5 rounded-lg border border-white/10">
-            <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Week 3 (15-21)
-          </div>
-          <div class="flex items-center gap-1.5 bg-black/40 px-3 py-1.5 rounded-lg border border-white/10">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> Week 4 (22-28)
-          </div>
-          <div class="flex items-center gap-1.5 bg-black/40 px-3 py-1.5 rounded-lg border border-white/10">
-            <span class="w-2.5 h-2.5 rounded-full bg-purple-400"></span> Week 5 (29-31)
-          </div>
-        </div>
-      </div>
-
-      <!-- THE CORE 1-31 SPREADSHEET MATRIX TABLE -->
-      <div class="glass-panel rounded-2xl border border-white/10 shadow-2xl overflow-hidden">
-        <div class="matrix-table-wrap">
-          <table class="w-full border-collapse text-xs select-none">
-            <thead>
-              <!-- Row 1: Week Header Banners -->
-              <tr class="text-center font-bold text-white tracking-wider">
-                <th rowspan="2" class="p-3 bg-brand-900 border-r border-b border-white/10 text-left min-w-[220px] max-w-[280px]">
-                  <div class="flex items-center justify-between">
-                    <span class="text-sm font-bold text-slate-200">Habits / Tasks</span>
-                    <button onclick="openAddHabitModal()" class="text-slate-400 hover:text-white p-1" title="Add Habit">
-                      <i class="ph-bold ph-plus-circle text-base"></i>
-                    </button>
-                  </div>
-                </th>
-                <!-- Week 1 Banner -->
-                <th colspan="7" class="py-2 px-1 bg-amber-600/90 text-amber-950 font-black border-r border-b border-amber-700/60 uppercase">
-                  Week 1
-                </th>
-                <!-- Week 2 Banner -->
-                <th colspan="7" class="py-2 px-1 bg-sky-600/90 text-sky-950 font-black border-r border-b border-sky-700/60 uppercase">
-                  Week 2
-                </th>
-                <!-- Week 3 Banner -->
-                <th colspan="7" class="py-2 px-1 bg-rose-600/90 text-rose-950 font-black border-r border-b border-rose-700/60 uppercase">
-                  Week 3
-                </th>
-                <!-- Week 4 Banner -->
-                <th colspan="7" class="py-2 px-1 bg-emerald-600/90 text-emerald-950 font-black border-r border-b border-emerald-700/60 uppercase">
-                  Week 4
-                </th>
-                <!-- Week 5 Banner -->
-                <th colspan="3" class="py-2 px-1 bg-purple-600/90 text-purple-950 font-black border-r border-b border-purple-700/60 uppercase">
-                  Week 5
-                </th>
-                <!-- Goal & Progress Header -->
-                <th rowspan="2" class="py-2 px-3 bg-amber-500/20 text-amber-300 font-bold border-r border-b border-white/10 min-w-[70px]">
-                  Goal
-                </th>
-                <th rowspan="2" class="py-2 px-4 bg-purple-500/20 text-purple-300 font-bold border-r border-b border-white/10 min-w-[160px]">
-                  Progress
-                </th>
-                <th rowspan="2" class="py-2 px-2 bg-brand-900 border-b border-white/10 text-slate-400 w-12 text-center">
-                  Action
-                </th>
-              </tr>
-
-              <!-- Row 2: Days Numbers 1-31 (All 31 Columns Present & Preserved) -->
-              <tr id="daysNumberHeaderRow" class="text-center font-mono text-[11px] font-bold border-b border-white/10">
-                <!-- Week 1 Days (1-7) -->
-                <th class="w-8 py-1.5 bg-amber-950/40 text-amber-300 border-r border-white/5">1</th>
-                <th class="w-8 py-1.5 bg-amber-950/40 text-amber-300 border-r border-white/5">2</th>
-                <th class="w-8 py-1.5 bg-amber-950/40 text-amber-300 border-r border-white/5">3</th>
-                <th class="w-8 py-1.5 bg-gradient-to-b from-indigo-600 to-purple-600 text-white font-black ring-2 ring-purple-400 border-r border-white/5 shadow-lg shadow-purple-500/30" title="TODAY: Wednesday, Nov 4">4</th>
-                <th class="w-8 py-1.5 bg-amber-950/40 text-amber-300 border-r border-white/5">5</th>
-                <th class="w-8 py-1.5 bg-amber-950/40 text-amber-300 border-r border-white/5">6</th>
-                <th class="w-8 py-1.5 bg-amber-950/40 text-amber-300 border-r border-white/10">7</th>
-
-                <!-- Week 2 Days (8-14) -->
-                <th class="w-8 py-1.5 bg-sky-950/40 text-sky-300 border-r border-white/5">8</th>
-                <th class="w-8 py-1.5 bg-sky-950/40 text-sky-300 border-r border-white/5">9</th>
-                <th class="w-8 py-1.5 bg-sky-950/40 text-sky-300 border-r border-white/5">10</th>
-                <th class="w-8 py-1.5 bg-sky-950/40 text-sky-300 border-r border-white/5">11</th>
-                <th class="w-8 py-1.5 bg-sky-950/40 text-sky-300 border-r border-white/5">12</th>
-                <th class="w-8 py-1.5 bg-sky-950/40 text-sky-300 border-r border-white/5">13</th>
-                <th class="w-8 py-1.5 bg-sky-950/40 text-sky-300 border-r border-white/10">14</th>
-
-                <!-- Week 3 Days (15-21) -->
-                <th class="w-8 py-1.5 bg-rose-950/40 text-rose-300 border-r border-white/5">15</th>
-                <th class="w-8 py-1.5 bg-rose-950/40 text-rose-300 border-r border-white/5">16</th>
-                <th class="w-8 py-1.5 bg-rose-950/40 text-rose-300 border-r border-white/5">17</th>
-                <th class="w-8 py-1.5 bg-rose-950/40 text-rose-300 border-r border-white/5">18</th>
-                <th class="w-8 py-1.5 bg-rose-950/40 text-rose-300 border-r border-white/5">19</th>
-                <th class="w-8 py-1.5 bg-rose-950/40 text-rose-300 border-r border-white/5">20</th>
-                <th class="w-8 py-1.5 bg-rose-950/40 text-rose-300 border-r border-white/10">21</th>
-
-                <!-- Week 4 Days (22-28) -->
-                <th class="w-8 py-1.5 bg-emerald-950/40 text-emerald-300 border-r border-white/5">22</th>
-                <th class="w-8 py-1.5 bg-emerald-950/40 text-emerald-300 border-r border-white/5">23</th>
-                <th class="w-8 py-1.5 bg-emerald-950/40 text-emerald-300 border-r border-white/5">24</th>
-                <th class="w-8 py-1.5 bg-emerald-950/40 text-emerald-300 border-r border-white/5">25</th>
-                <th class="w-8 py-1.5 bg-emerald-950/40 text-emerald-300 border-r border-white/5">26</th>
-                <th class="w-8 py-1.5 bg-emerald-950/40 text-emerald-300 border-r border-white/5">27</th>
-                <th class="w-8 py-1.5 bg-emerald-950/40 text-emerald-300 border-r border-white/10">28</th>
-
-                <!-- Week 5 Days (29-31) -->
-                <th class="w-8 py-1.5 bg-purple-950/40 text-purple-300 border-r border-white/5">29</th>
-                <th class="w-8 py-1.5 bg-purple-950/40 text-purple-300 border-r border-white/5">30</th>
-                <th class="w-8 py-1.5 bg-purple-950/40 text-purple-300 border-r border-white/10">31</th>
-              </tr>
-
-              <!-- Row 3: Days of Week (Synchronized with Real Dates: Nov 1 = Sun -> Day 4 = Wed) -->
-              <tr id="daysOfWeekHeaderRow" class="text-center text-[10px] uppercase font-mono text-slate-400 bg-brand-950/80 border-b border-white/10">
-                <th class="p-1.5 text-left pl-3 text-slate-400 font-normal">Day of Week</th>
-
-                <!-- Week 1: 1=Sun(S), 2=Mon(M), 3=Tue(T), 4=Wed(W), 5=Thu(T), 6=Fri(F), 7=Sat(S) -->
-                <th class="border-r border-white/5 text-amber-400 font-bold" title="Sunday, Nov 1">S</th>
-                <th class="border-r border-white/5" title="Monday, Nov 2">M</th>
-                <th class="border-r border-white/5" title="Tuesday, Nov 3">T</th>
-                <th class="border-r border-white/5 bg-indigo-600 text-white font-black ring-2 ring-purple-400" title="TODAY: Wednesday, Nov 4">W</th>
-                <th class="border-r border-white/5" title="Thursday, Nov 5">T</th>
-                <th class="border-r border-white/5" title="Friday, Nov 6">F</th>
-                <th class="border-r border-white/10 text-amber-400 font-bold" title="Saturday, Nov 7">S</th>
-
-                <!-- Week 2: 8=Sun(S), 9=Mon(M), 10=Tue(T), 11=Wed(W), 12=Thu(T), 13=Fri(F), 14=Sat(S) -->
-                <th class="border-r border-white/5 text-sky-400 font-bold" title="Sunday, Nov 8">S</th>
-                <th class="border-r border-white/5" title="Monday, Nov 9">M</th>
-                <th class="border-r border-white/5" title="Tuesday, Nov 10">T</th>
-                <th class="border-r border-white/5" title="Wednesday, Nov 11">W</th>
-                <th class="border-r border-white/5" title="Thursday, Nov 12">T</th>
-                <th class="border-r border-white/5" title="Friday, Nov 13">F</th>
-                <th class="border-r border-white/10 text-sky-400 font-bold" title="Saturday, Nov 14">S</th>
-
-                <!-- Week 3: 15=Sun(S), 16=Mon(M), 17=Tue(T), 18=Wed(W), 19=Thu(T), 20=Fri(F), 21=Sat(S) -->
-                <th class="border-r border-white/5 text-rose-400 font-bold" title="Sunday, Nov 15">S</th>
-                <th class="border-r border-white/5" title="Monday, Nov 16">M</th>
-                <th class="border-r border-white/5" title="Tuesday, Nov 17">T</th>
-                <th class="border-r border-white/5" title="Wednesday, Nov 18">W</th>
-                <th class="border-r border-white/5" title="Thursday, Nov 19">T</th>
-                <th class="border-r border-white/5" title="Friday, Nov 20">F</th>
-                <th class="border-r border-white/10 text-rose-400 font-bold" title="Saturday, Nov 21">S</th>
-
-                <!-- Week 4: 22=Sun(S), 23=Mon(M), 24=Tue(T), 25=Wed(W), 26=Thu(T), 27=Fri(F), 28=Sat(S) -->
-                <th class="border-r border-white/5 text-emerald-400 font-bold" title="Sunday, Nov 22">S</th>
-                <th class="border-r border-white/5" title="Monday, Nov 23">M</th>
-                <th class="border-r border-white/5" title="Tuesday, Nov 24">T</th>
-                <th class="border-r border-white/5" title="Wednesday, Nov 25">W</th>
-                <th class="border-r border-white/5" title="Thursday, Nov 26">T</th>
-                <th class="border-r border-white/5" title="Friday, Nov 27">F</th>
-                <th class="border-r border-white/10 text-emerald-400 font-bold" title="Saturday, Nov 28">S</th>
-
-                <!-- Week 5: 29=Sun(S), 30=Mon(M), 31=Tue(T) -->
-                <th class="border-r border-white/5 text-purple-400 font-bold" title="Sunday, Nov 29">S</th>
-                <th class="border-r border-white/5" title="Monday, Nov 30">M</th>
-                <th class="border-r border-white/10" title="Tuesday, Nov 31">T</th>
-
-                <th class="border-r border-white/10"></th><th class="border-r border-white/10"></th><th></th>
-              </tr>
-            </thead>
-
-            <!-- Matrix Habits Rows (Dynamically Populated) -->
-            <tbody id="matrixTableBody" class="divide-y divide-white/5 bg-brand-900/40">
-              <!-- Injected by JS -->
-            </tbody>
-
-            <!-- MATRIX SUMMARY ROWS (Bottom Calculations) -->
-            <tfoot class="bg-brand-950 font-mono text-[11px] border-t-2 border-white/20 divide-y divide-white/10">
-              <!-- Row 1: Habits Completed count per day -->
-              <tr class="hover:bg-white/[0.02]">
-                <td class="p-2.5 font-bold text-slate-300 pl-3">Habits Completed</td>
-                <td colspan="31" id="dailyCompletedContainer" class="p-0">
-                  <div id="dailyCompletedRow" class="grid grid-cols-31 text-center font-bold text-emerald-400"></div>
-                </td>
-                <td id="grandTotalCompleted" class="text-center font-bold text-emerald-400 bg-emerald-950/30">0</td>
-                <td colspan="2" class="text-center text-slate-500 text-[10px]">Total Month Done</td>
-              </tr>
-
-              <!-- Row 2: Habits Incomplete count per day -->
-              <tr class="hover:bg-white/[0.02]">
-                <td class="p-2.5 font-bold text-slate-400 pl-3">Habits Incomplete</td>
-                <td colspan="31" id="dailyIncompleteContainer" class="p-0">
-                  <div id="dailyIncompleteRow" class="grid grid-cols-31 text-center text-rose-400/80"></div>
-                </td>
-                <td id="grandTotalIncomplete" class="text-center font-bold text-rose-400 bg-rose-950/30">0</td>
-                <td colspan="2" class="text-center text-slate-500 text-[10px]">Total Incomplete</td>
-              </tr>
-
-              <!-- Row 3: Weekly Habits Completed Summary -->
-              <tr class="bg-brand-900/90 font-bold">
-                <td class="p-2.5 text-slate-200 pl-3">Weekly Habits Completed</td>
-                <td colspan="7" id="w1CompletedSum" class="text-center text-amber-300 border-r border-white/10 py-2">0</td>
-                <td colspan="7" id="w2CompletedSum" class="text-center text-sky-300 border-r border-white/10 py-2">0</td>
-                <td colspan="7" id="w3CompletedSum" class="text-center text-rose-300 border-r border-white/10 py-2">0</td>
-                <td colspan="7" id="w4CompletedSum" class="text-center text-emerald-300 border-r border-white/10 py-2">0</td>
-                <td colspan="3" id="w5CompletedSum" class="text-center text-purple-300 border-r border-white/10 py-2">0</td>
-                <td colspan="3" class="bg-brand-950"></td>
-              </tr>
-
-              <!-- Row 4: Weekly Habits Incomplete Summary -->
-              <tr class="bg-brand-900/60 font-semibold text-slate-400">
-                <td class="p-2.5 pl-3">Weekly Habits Incomplete</td>
-                <td colspan="7" id="w1IncompleteSum" class="text-center border-r border-white/10 py-1.5">0</td>
-                <td colspan="7" id="w2IncompleteSum" class="text-center border-r border-white/10 py-1.5">0</td>
-                <td colspan="7" id="w3IncompleteSum" class="text-center border-r border-white/10 py-1.5">0</td>
-                <td colspan="7" id="w4IncompleteSum" class="text-center border-r border-white/10 py-1.5">0</td>
-                <td colspan="3" id="w5IncompleteSum" class="text-center border-r border-white/10 py-1.5">0</td>
-                <td colspan="3" class="bg-brand-950"></td>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
-      </div>
-
-      <!-- ========================================== -->
-      <!-- DONUT CHARTS PANEL (Spreadsheet Synchronized) -->
-      <!-- ========================================== -->
-      <div class="space-y-3">
-        <div class="flex items-center justify-between">
-          <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-            <i class="ph-bold ph-chart-donut text-purple-400"></i>
-            Weekly Sprint Donut Trajectory & Monthly Success
-          </h3>
-          <span class="text-xs font-mono text-slate-500 hidden sm:inline">Synchronized directly with matrix cells</span>
-        </div>
-
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-          <!-- Week 1 Donut -->
-          <div class="glass-panel rounded-2xl p-4 border border-amber-500/20 flex flex-col items-center justify-between">
-            <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">Week 1</span>
-            <div class="w-24 h-24 sm:w-28 sm:h-28 my-2 relative flex items-center justify-center">
-              <canvas id="w1DonutChart"></canvas>
-            </div>
-            <div class="text-center font-mono">
-              <span id="w1PercentageLabel" class="text-base font-extrabold text-amber-400">0.00%</span>
-              <p class="text-[10px] text-slate-400">Days 1 - 7</p>
-            </div>
-          </div>
-
-          <!-- Week 2 Donut -->
-          <div class="glass-panel rounded-2xl p-4 border border-sky-500/20 flex flex-col items-center justify-between">
-            <span class="text-xs font-bold text-sky-400 uppercase tracking-wider">Week 2</span>
-            <div class="w-24 h-24 sm:w-28 sm:h-28 my-2 relative flex items-center justify-center">
-              <canvas id="w2DonutChart"></canvas>
-            </div>
-            <div class="text-center font-mono">
-              <span id="w2PercentageLabel" class="text-base font-extrabold text-sky-400">0.00%</span>
-              <p class="text-[10px] text-slate-400">Days 8 - 14</p>
-            </div>
-          </div>
-
-          <!-- Week 3 Donut -->
-          <div class="glass-panel rounded-2xl p-4 border border-rose-500/20 flex flex-col items-center justify-between">
-            <span class="text-xs font-bold text-rose-400 uppercase tracking-wider">Week 3</span>
-            <div class="w-24 h-24 sm:w-28 sm:h-28 my-2 relative flex items-center justify-center">
-              <canvas id="w3DonutChart"></canvas>
-            </div>
-            <div class="text-center font-mono">
-              <span id="w3PercentageLabel" class="text-base font-extrabold text-rose-400">0.00%</span>
-              <p class="text-[10px] text-slate-400">Days 15 - 21</p>
-            </div>
-          </div>
-
-          <!-- Week 4 Donut -->
-          <div class="glass-panel rounded-2xl p-4 border border-emerald-500/20 flex flex-col items-center justify-between">
-            <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Week 4</span>
-            <div class="w-24 h-24 sm:w-28 sm:h-28 my-2 relative flex items-center justify-center">
-              <canvas id="w4DonutChart"></canvas>
-            </div>
-            <div class="text-center font-mono">
-              <span id="w4PercentageLabel" class="text-base font-extrabold text-emerald-400">0.00%</span>
-              <p class="text-[10px] text-slate-400">Days 22 - 28</p>
-            </div>
-          </div>
-
-          <!-- Week 5 Donut -->
-          <div class="glass-panel rounded-2xl p-4 border border-purple-500/20 flex flex-col items-center justify-between">
-            <span class="text-xs font-bold text-purple-400 uppercase tracking-wider">Week 5</span>
-            <div class="w-24 h-24 sm:w-28 sm:h-28 my-2 relative flex items-center justify-center">
-              <canvas id="w5DonutChart"></canvas>
-            </div>
-            <div class="text-center font-mono">
-              <span id="w5PercentageLabel" class="text-base font-extrabold text-purple-400">0.00%</span>
-              <p class="text-[10px] text-slate-400">Days 29 - 31</p>
-            </div>
-          </div>
-
-          <!-- Total Monthly Progress Donut (Featured) -->
-          <div class="glass-panel rounded-2xl p-4 border-2 border-indigo-500/40 bg-gradient-to-b from-brand-900 to-indigo-950/40 flex flex-col items-center justify-between shadow-lg shadow-indigo-900/30">
-            <span class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1">
-              <i class="ph-bold ph-seal-check text-indigo-400"></i> Total Month
-            </span>
-            <div class="w-24 h-24 sm:w-28 sm:h-28 my-2 relative flex items-center justify-center">
-              <canvas id="totalMonthDonutChart"></canvas>
-            </div>
-            <div class="text-center font-mono">
-              <span id="totalMonthPercentageLabel" class="text-lg font-black text-indigo-300">0.00%</span>
-              <p class="text-[10px] text-slate-400">Overall Success</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Secondary Charts -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2">
-        <div class="lg:col-span-2 glass-panel rounded-2xl p-5 border border-white/10">
-          <div class="flex items-center justify-between mb-3">
-            <h4 class="text-sm font-bold text-white flex items-center gap-2">
-              <i class="ph-bold ph-chart-bar text-sky-400"></i> Daily Completion Trajectory (Days 1 to 31)
-            </h4>
-            <span class="text-[11px] font-mono text-slate-400">Bar height = Finished Habits</span>
-          </div>
-          <div class="h-56">
-            <canvas id="dailyTrendBarChart"></canvas>
-          </div>
-        </div>
-
-        <div class="glass-panel rounded-2xl p-5 border border-white/10">
-          <div class="flex items-center justify-between mb-3">
-            <h4 class="text-sm font-bold text-white flex items-center gap-2">
-              <i class="ph-bold ph-pie-slice text-purple-400"></i> Domain Focus Split
-            </h4>
-            <span class="text-[11px] font-mono text-slate-400">Study vs Skill vs Health</span>
-          </div>
-          <div class="h-56 relative flex items-center justify-center">
-            <canvas id="categoryBalanceChart"></canvas>
-          </div>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- ========================================== -->
-    <!-- VIEW 2: CHATGPT-GRADE AI ASSISTANT & TIMETABLE -->
-    <!-- ========================================== -->
-    <section id="viewAI" class="hidden space-y-6">
-      
-      <!-- Top Diagnostic Overview Banner -->
-      <div class="glass-panel rounded-2xl p-6 border-indigo-500/30 bg-gradient-to-r from-brand-900 via-brand-850 to-purple-950/40 relative overflow-hidden">
-        <div class="max-w-3xl">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-semibold mb-3">
-            <i class="ph-fill ph-sparkle"></i> ChatGPT-Grade Conversational Intelligence & Routine Synthesizer
-          </div>
-          <h2 class="text-2xl font-black text-white">Astra AI Study Assistant & Matrix Loophole Doctor</h2>
-          <p class="text-xs sm:text-sm text-slate-300 mt-2 leading-relaxed">
-            Ask any question (coding, system design, communication frameworks, study strategies) or generate a custom timetable adapted to your daily college/work schedule. Push generated study blocks directly into your 31-day Habit Matrix with one click!
+          <p id="dashInspirationQuote" class="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
+            "You don't rise to the level of your goals. You fall to the level of your systems." Focus on today's execution crucible.
           </p>
         </div>
-      </div>
 
-      <!-- ChatGPT-Style Conversational Interface -->
-      <div class="glass-panel rounded-2xl border border-white/10 overflow-hidden flex flex-col h-[650px] shadow-2xl">
-        
-        <!-- Chat Header -->
-        <div class="p-4 border-b border-white/10 bg-brand-900/80 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white shadow-lg">
-              <i class="ph-bold ph-sparkle text-lg"></i>
-            </div>
-            <div>
-              <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                Astra AI Conversational Assistant
-                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-              </h3>
-              <p class="text-[11px] text-slate-400">Ask any question or request a personalized timetable</p>
-            </div>
-          </div>
-          <button onclick="openApiKeyModal()" class="px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-purple-300 flex items-center gap-1.5 transition-all">
-            <i class="ph-bold ph-sliders"></i> Engine Settings
+        <!-- Quick Action Buttons -->
+        <div class="flex flex-wrap items-center gap-3 relative z-10">
+          <button onclick="openAddTaskModal()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:brightness-110 active:scale-95 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 flex items-center gap-2 transition-all">
+            <i class="ph-bold ph-plus-circle text-base"></i> Add New Task
+          </button>
+          <button onclick="openAddTimetableModal()" class="px-4 py-2.5 rounded-xl bg-brand-850 hover:bg-brand-800 border border-white/15 text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-all">
+            <i class="ph-bold ph-clock-user text-base text-sky-400"></i> New Schedule Block
+          </button>
+          <button onclick="switchView('ai')" class="px-4 py-2.5 rounded-xl bg-brand-850 hover:bg-brand-800 border border-purple-500/30 text-purple-300 text-xs font-semibold flex items-center gap-1.5 transition-all">
+            <i class="ph-bold ph-sparkle text-base text-purple-400"></i> Ask Astra AI
           </button>
         </div>
+      </div>
 
-        <!-- Preset Quick Prompt Chips -->
-        <div class="px-4 py-2 bg-brand-950/60 border-b border-white/5 flex items-center gap-2 overflow-x-auto text-xs">
+      <!-- 5 KPI Summary Stat Cards -->
+      <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+        <!-- Total Tasks -->
+        <div class="glass-panel p-4 rounded-2xl border border-white/10 space-y-1">
+          <div class="flex items-center justify-between text-xs text-slate-400">
+            <span>Total Tasks</span>
+            <i class="ph-bold ph-list-numbers text-base text-indigo-400"></i>
+          </div>
+          <div id="statTotalTasks" class="text-2xl sm:text-3xl font-black text-white font-mono">0</div>
+          <div class="text-[11px] text-slate-500">Tracked in system</div>
+        </div>
+
+        <!-- Completed Tasks -->
+        <div class="glass-panel p-4 rounded-2xl border border-white/10 space-y-1">
+          <div class="flex items-center justify-between text-xs text-emerald-400">
+            <span>Completed</span>
+            <i class="ph-bold ph-check-circle text-base text-emerald-400"></i>
+          </div>
+          <div id="statCompletedTasks" class="text-2xl sm:text-3xl font-black text-emerald-400 font-mono">0</div>
+          <div class="text-[11px] text-slate-500">Finished deliverables</div>
+        </div>
+
+        <!-- Pending Tasks -->
+        <div class="glass-panel p-4 rounded-2xl border border-white/10 space-y-1">
+          <div class="flex items-center justify-between text-xs text-amber-400">
+            <span>Pending</span>
+            <i class="ph-bold ph-hourglass-high text-base text-amber-400"></i>
+          </div>
+          <div id="statPendingTasks" class="text-2xl sm:text-3xl font-black text-amber-400 font-mono">0</div>
+          <div class="text-[11px] text-slate-500">Awaiting your focus</div>
+        </div>
+
+        <!-- Overdue Tasks -->
+        <div id="cardOverdueStat" class="glass-panel p-4 rounded-2xl border border-white/10 space-y-1">
+          <div class="flex items-center justify-between text-xs text-rose-400">
+            <span>Overdue</span>
+            <i class="ph-bold ph-warning-circle text-base text-rose-400"></i>
+          </div>
+          <div id="statOverdueTasks" class="text-2xl sm:text-3xl font-black text-rose-400 font-mono">0</div>
+          <div class="text-[11px] text-slate-500">Past target date</div>
+        </div>
+
+        <!-- Completion Rate % -->
+        <div class="glass-panel p-4 rounded-2xl border border-white/10 space-y-1 col-span-2 lg:col-span-1">
+          <div class="flex items-center justify-between text-xs text-purple-300">
+            <span>Completion Rate</span>
+            <i class="ph-bold ph-chart-pie-slice text-base text-purple-400"></i>
+          </div>
+          <div id="statCompletionRate" class="text-2xl sm:text-3xl font-black text-purple-400 font-mono">0%</div>
+          <div class="w-full bg-brand-950 h-2 rounded-full overflow-hidden border border-white/10 mt-1">
+            <div id="statCompletionProgressBar" class="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Dashboard Grid: Today's Schedule & Deadlines -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Today's Schedule & Active Ongoing Activity (Left 2 Columns) -->
+        <div class="lg:col-span-2 space-y-4">
+          <!-- Active Now Live Banner -->
+          <div id="liveActivityBanner" class="p-4 rounded-2xl bg-gradient-to-r from-indigo-900/40 via-purple-900/30 to-brand-900 border border-indigo-500/30 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="w-3 h-3 rounded-full bg-emerald-400 animate-ping"></span>
+              <div>
+                <span class="text-[10px] uppercase font-mono tracking-wider text-emerald-400 font-bold">Activity Status Right Now</span>
+                <h4 id="liveActivityTitle" class="text-sm font-bold text-white mt-0.5">Deep Work Crucible (08:00 - 10:00)</h4>
+              </div>
+            </div>
+            <button onclick="switchView('timetable')" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-xs text-indigo-200 flex items-center gap-1 transition-all">
+              <span>View Timetable</span> <i class="ph-bold ph-arrow-right"></i>
+            </button>
+          </div>
+
+          <!-- Today's Focus Tasks & Schedule List -->
+          <div class="glass-panel rounded-2xl p-6 border border-white/10 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-white/10">
+              <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <i class="ph-bold ph-sun text-amber-400 text-lg"></i> Today's Schedule & Priorities
+              </h3>
+              <div class="flex items-center gap-2">
+                <button onclick="openAddTaskModal()" class="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs flex items-center gap-1 transition-all">
+                  <i class="ph-bold ph-plus"></i> Add Task
+                </button>
+                <button onclick="switchView('tasks')" class="text-xs text-slate-400 hover:text-white transition-all">
+                  View All Tasks &rarr;
+                </button>
+              </div>
+            </div>
+
+            <!-- List Container -->
+            <div id="dashTodayTasksList" class="space-y-2.5">
+              <!-- Injected via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Upcoming Deadlines & AI Recommendations (Right Column) -->
+        <div class="space-y-4">
+          <!-- Deadlines Widget -->
+          <div class="glass-panel rounded-2xl p-6 border border-white/10 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-white/10">
+              <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <i class="ph-bold ph-calendar-x text-rose-400 text-lg"></i> Upcoming Deadlines
+              </h3>
+              <span id="dashDeadlineCountBadge" class="text-xs font-mono text-slate-400">0 tasks</span>
+            </div>
+            <div id="dashUpcomingDeadlinesList" class="space-y-2.5">
+              <!-- Injected via JS -->
+            </div>
+          </div>
+
+          <!-- Quick AI Assistant Card -->
+          <div class="glass-panel rounded-2xl p-6 border border-purple-500/20 bg-gradient-to-br from-purple-950/20 via-brand-900 to-indigo-950/20 space-y-3">
+            <div class="flex items-center gap-2.5 text-purple-300">
+              <i class="ph-bold ph-sparkle text-xl text-purple-400"></i>
+              <h4 class="text-sm font-bold text-white">Astra AI Productivity Coach</h4>
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Ask Astra to create a custom study timetable, identify your most urgent tasks, or analyze your weekly habit compliance.
+            </p>
+            <div class="pt-1 flex flex-col gap-2">
+              <button onclick="sendQuickPrompt('What tasks are pending today?')" class="w-full text-left px-3 py-2 rounded-xl bg-brand-950/80 border border-white/10 hover:border-purple-400/40 text-xs text-slate-300 hover:text-white transition-all flex items-center justify-between">
+                <span>"What tasks are pending today?"</span>
+                <i class="ph-bold ph-arrow-right text-purple-400"></i>
+              </button>
+              <button onclick="sendQuickPrompt('Create an ultra-efficient 5-hour study timetable for tomorrow')" class="w-full text-left px-3 py-2 rounded-xl bg-brand-950/80 border border-white/10 hover:border-purple-400/40 text-xs text-slate-300 hover:text-white transition-all flex items-center justify-between">
+                <span>"Create a 5-hour study timetable for tomorrow"</span>
+                <i class="ph-bold ph-arrow-right text-purple-400"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================================================== -->
+    <!-- VIEW 2: MY TIMETABLE (DAILY & WEEKLY SCHEDULE)       -->
+    <!-- ==================================================== -->
+    <section id="viewTimetable" class="hidden space-y-6">
+      <!-- Timetable Header -->
+      <div class="glass-panel-elevated rounded-2xl p-6 border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/30 text-sky-300 text-xs font-semibold mb-2">
+            <i class="ph-bold ph-clock text-sky-400"></i> Master Schedule & Ultradian Blocks
+          </div>
+          <h2 class="text-2xl font-black text-white">My Daily & Weekly Timetable</h2>
+          <p class="text-xs sm:text-sm text-slate-400 mt-0.5">Organize your study blocks, lectures, deep work, and scheduled breaks</p>
+        </div>
+
+        <div class="flex items-center gap-2.5">
+          <button onclick="openAddTimetableModal()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:brightness-110 active:scale-95 text-white font-bold text-xs shadow-md flex items-center gap-1.5 transition-all">
+            <i class="ph-bold ph-plus-circle text-base"></i> Add Schedule Block
+          </button>
+          <button onclick="sendQuickPrompt('Create an ultra-efficient 5-hour study timetable for college & LeetCode')" class="px-4 py-2 rounded-xl bg-brand-900 border border-purple-500/30 hover:bg-purple-900/20 text-purple-300 font-semibold text-xs flex items-center gap-1.5 transition-all">
+            <i class="ph-bold ph-magic-wand text-base"></i> AI Generate Timetable
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Ongoing Activity Banner inside Timetable -->
+      <div id="timetableLiveBanner" class="p-4 rounded-2xl bg-brand-900/90 border border-sky-500/30 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-3 h-3 rounded-full bg-emerald-400 animate-ping"></div>
+          <div>
+            <span class="text-[10px] font-mono uppercase text-emerald-400 font-bold">Currently Scheduled Right Now</span>
+            <h4 id="timetableLiveTitle" class="text-sm font-bold text-white mt-0.5">Algorithm Crucible & Problem Solving</h4>
+          </div>
+        </div>
+        <div id="timetableLiveTime" class="text-xs font-mono font-bold text-sky-300 bg-sky-950/60 px-3 py-1.5 rounded-lg border border-sky-500/30">
+          08:00 - 10:00
+        </div>
+      </div>
+
+      <!-- Day Tabs Filter (Monday through Sunday + Daily) -->
+      <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-semibold">
+        <button id="ttDayTabAll" onclick="filterTimetableByDay('All')" class="px-4 py-2 rounded-xl bg-indigo-600 text-white transition-all shadow-md">
+          All Blocks
+        </button>
+        <button id="ttDayTabToday" onclick="filterTimetableByDay('Today')" class="px-4 py-2 rounded-xl bg-brand-900 border border-white/10 text-slate-300 hover:text-white transition-all">
+          Today
+        </button>
+        <button id="ttDayTabMonday" onclick="filterTimetableByDay('Monday')" class="px-3.5 py-2 rounded-xl bg-brand-900 border border-white/10 text-slate-300 hover:text-white transition-all">Mon</button>
+        <button id="ttDayTabTuesday" onclick="filterTimetableByDay('Tuesday')" class="px-3.5 py-2 rounded-xl bg-brand-900 border border-white/10 text-slate-300 hover:text-white transition-all">Tue</button>
+        <button id="ttDayTabWednesday" onclick="filterTimetableByDay('Wednesday')" class="px-3.5 py-2 rounded-xl bg-brand-900 border border-white/10 text-slate-300 hover:text-white transition-all">Wed</button>
+        <button id="ttDayTabThursday" onclick="filterTimetableByDay('Thursday')" class="px-3.5 py-2 rounded-xl bg-brand-900 border border-white/10 text-slate-300 hover:text-white transition-all">Thu</button>
+        <button id="ttDayTabFriday" onclick="filterTimetableByDay('Friday')" class="px-3.5 py-2 rounded-xl bg-brand-900 border border-white/10 text-slate-300 hover:text-white transition-all">Fri</button>
+        <button id="ttDayTabSaturday" onclick="filterTimetableByDay('Saturday')" class="px-3.5 py-2 rounded-xl bg-brand-900 border border-white/10 text-slate-300 hover:text-white transition-all">Sat</button>
+        <button id="ttDayTabSunday" onclick="filterTimetableByDay('Sunday')" class="px-3.5 py-2 rounded-xl bg-brand-900 border border-white/10 text-slate-300 hover:text-white transition-all">Sun</button>
+      </div>
+
+      <!-- Timetable Blocks Grid -->
+      <div id="timetableBlocksGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Injected via JS -->
+      </div>
+    </section>
+
+    <!-- ==================================================== -->
+    <!-- VIEW 3: COMPLETE TASK MANAGEMENT SYSTEM              -->
+    <!-- ==================================================== -->
+    <section id="viewTasks" class="hidden space-y-6">
+      <!-- Tasks Header & Quick Controls -->
+      <div class="glass-panel-elevated rounded-2xl p-6 border border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-semibold mb-2">
+            <i class="ph-bold ph-check-square-offset text-emerald-400"></i> Full Task Management System
+          </div>
+          <h2 class="text-2xl font-black text-white">Tasks & Deliverables</h2>
+          <p class="text-xs sm:text-sm text-slate-400 mt-0.5">Add, edit, prioritize, schedule, and complete your tasks with instant persistence</p>
+        </div>
+
+        <button onclick="openAddTaskModal()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:brightness-110 active:scale-95 text-white font-bold text-xs shadow-lg shadow-emerald-600/30 flex items-center gap-1.5 transition-all">
+          <i class="ph-bold ph-plus-circle text-base"></i> Add New Task
+        </button>
+      </div>
+
+      <!-- Task Search & Filter Toolbar -->
+      <div class="glass-panel rounded-2xl p-4 border border-white/10 space-y-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <!-- Search Input -->
+          <div class="relative">
+            <i class="ph-bold ph-magnifying-glass absolute left-3 top-3 text-slate-400"></i>
+            <input type="text" id="taskSearchInput" oninput="handleTaskSearch(this.value)" placeholder="Search tasks by title or notes..."
+              class="w-full bg-brand-950 border border-white/15 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+          </div>
+
+          <!-- Status Filter -->
+          <div>
+            <select id="taskStatusFilter" onchange="setTaskFilter('status', this.value)" class="w-full bg-brand-950 border border-white/15 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
+              <option value="all">All Statuses (Pending & Completed)</option>
+              <option value="pending" selected>Pending Only</option>
+              <option value="completed">Completed Only</option>
+              <option value="overdue">Overdue Only</option>
+            </select>
+          </div>
+
+          <!-- Priority Filter -->
+          <div>
+            <select id="taskPriorityFilter" onchange="setTaskFilter('priority', this.value)" class="w-full bg-brand-950 border border-white/15 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
+              <option value="all" selected>All Priorities</option>
+              <option value="High">🔴 High Priority</option>
+              <option value="Medium">🟡 Medium Priority</option>
+              <option value="Low">🟢 Low Priority</option>
+            </select>
+          </div>
+
+          <!-- Category Filter -->
+          <div>
+            <select id="taskCategoryFilter" onchange="setTaskFilter('category', this.value)" class="w-full bg-brand-950 border border-white/15 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
+              <option value="all" selected>All Categories</option>
+              <option value="Study">Study & DSA</option>
+              <option value="Work">Work & Engineering</option>
+              <option value="Health">Health & Fitness</option>
+              <option value="Personal">Personal & Life</option>
+              <option value="Project">Project & Code</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Quick Date Filters & Result Count -->
+        <div class="flex items-center justify-between text-xs pt-1 border-t border-white/5">
+          <div class="flex items-center gap-2 overflow-x-auto pb-1">
+            <span class="text-slate-400 font-medium">Date:</span>
+            <button onclick="setTaskFilter('date', 'all')" id="btnDateFilterAll" class="px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-semibold">All</button>
+            <button onclick="setTaskFilter('date', 'today')" id="btnDateFilterToday" class="px-2.5 py-1 rounded-lg bg-brand-900 text-slate-400 hover:text-white">Today</button>
+            <button onclick="setTaskFilter('date', 'tomorrow')" id="btnDateFilterTomorrow" class="px-2.5 py-1 rounded-lg bg-brand-900 text-slate-400 hover:text-white">Tomorrow</button>
+            <button onclick="setTaskFilter('date', 'upcoming')" id="btnDateFilterUpcoming" class="px-2.5 py-1 rounded-lg bg-brand-900 text-slate-400 hover:text-white">Upcoming</button>
+          </div>
+          <span id="taskFilteredCountLabel" class="text-slate-400 font-mono text-[11px]">Showing 0 tasks</span>
+        </div>
+      </div>
+
+      <!-- Tasks List Container -->
+      <div id="tasksListContainer" class="space-y-3">
+        <!-- Injected via JS -->
+      </div>
+    </section>
+
+    <!-- ==================================================== -->
+    <!-- VIEW 4: INTERACTIVE CALENDAR & SCHEDULE VIEW         -->
+    <!-- ==================================================== -->
+    <section id="viewCalendar" class="hidden space-y-6">
+      <!-- Calendar Header & Navigation Controls -->
+      <div class="glass-panel-elevated rounded-2xl p-6 border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold mb-2">
+            <i class="ph-bold ph-calendar text-amber-400"></i> Interactive Monthly Schedule & Deadlines
+          </div>
+          <h2 id="calendarMonthHeading" class="text-2xl font-black text-white">November 2026</h2>
+          <p class="text-xs sm:text-sm text-slate-400 mt-0.5">Click any day to inspect and schedule tasks for that specific date</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="changeCalendarMonthOffset(-1)" class="p-2 rounded-xl bg-brand-900 border border-white/15 text-slate-300 hover:text-white transition-all" title="Previous Month">
+            <i class="ph-bold ph-caret-left text-lg"></i>
+          </button>
+          <button onclick="jumpCalendarToCurrentMonth()" class="px-3.5 py-2 rounded-xl bg-brand-900 border border-white/15 text-xs font-semibold text-slate-200 hover:text-white transition-all">
+            Today
+          </button>
+          <button onclick="changeCalendarMonthOffset(1)" class="p-2 rounded-xl bg-brand-900 border border-white/15 text-slate-300 hover:text-white transition-all" title="Next Month">
+            <i class="ph-bold ph-caret-right text-lg"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Calendar Main Layout (Grid on Left, Date Task Inspector on Right) -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- 7x6 Calendar Grid (2 Columns) -->
+        <div class="lg:col-span-2 glass-panel rounded-2xl p-4 sm:p-6 border border-white/10 space-y-4">
+          <!-- Weekday Headers -->
+          <div class="grid grid-cols-7 text-center font-mono text-xs font-bold text-slate-400 pb-2 border-b border-white/10">
+            <span class="text-rose-400">Sun</span>
+            <span>Mon</span>
+            <span>Tue</span>
+            <span>Wed</span>
+            <span>Thu</span>
+            <span>Fri</span>
+            <span class="text-sky-400">Sat</span>
+          </div>
+
+          <!-- Calendar Days Grid Cells -->
+          <div id="calendarDaysGrid" class="grid grid-cols-7 gap-2">
+            <!-- Injected via JS -->
+          </div>
+        </div>
+
+        <!-- Selected Date Task Inspector Panel (1 Column) -->
+        <div class="glass-panel rounded-2xl p-6 border border-white/10 space-y-4 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between pb-3 border-b border-white/10">
+              <div>
+                <span class="text-[10px] uppercase font-mono text-purple-300 font-bold">Selected Date Inspector</span>
+                <h3 id="selectedDateInspectorHeading" class="text-base font-bold text-white mt-0.5">Wednesday, Nov 4</h3>
+              </div>
+              <button onclick="openAddTaskForSelectedDate()" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs flex items-center gap-1 shadow-md">
+                <i class="ph-bold ph-plus"></i> Add
+              </button>
+            </div>
+
+            <div id="selectedDateTasksList" class="space-y-2.5 mt-4 max-h-[380px] overflow-y-auto">
+              <!-- Injected via JS -->
+            </div>
+          </div>
+
+          <div class="pt-4 border-t border-white/5 text-xs text-slate-400 flex items-center justify-between">
+            <span>Colored dots indicate scheduled tasks on that date.</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================================================== -->
+    <!-- VIEW 5: REAL GEMINI-POWERED AI ASSISTANT CHAT        -->
+    <!-- ==================================================== -->
+    <section id="viewAI" class="hidden space-y-6">
+      
+      <!-- AI Header -->
+      <div class="glass-panel rounded-2xl p-6 border-purple-500/20 bg-gradient-to-r from-brand-900 via-brand-850 to-purple-950/30 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-semibold mb-2">
+            <i class="ph-fill ph-sparkle text-purple-400"></i> Google Gemini Flash Powered Intelligence
+          </div>
+          <h2 class="text-2xl font-black text-white">Astra Conversational AI & Schedule Synthesizer</h2>
+          <p class="text-xs sm:text-sm text-slate-300 mt-1 max-w-2xl leading-relaxed">
+            Connected to the actual Gemini API. Astra understands your active tasks, timetable, and habit matrix. Ask it to create schedules, recommend priorities, or schedule tasks with 1-click confirmation!
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="openApiKeyModal()" class="px-3.5 py-2 rounded-xl bg-brand-900 border border-white/15 text-slate-300 hover:text-white text-xs font-semibold flex items-center gap-1.5 transition-all">
+            <i class="ph-bold ph-key text-purple-400"></i> Gemini Key
+          </button>
+          <button onclick="clearChatHistory()" class="px-3.5 py-2 rounded-xl bg-brand-900 border border-white/15 text-slate-400 hover:text-rose-400 text-xs font-semibold flex items-center gap-1.5 transition-all">
+            <i class="ph-bold ph-trash"></i> Clear Chat
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Conversational Interface Shell -->
+      <div class="glass-panel-elevated rounded-2xl border border-white/10 flex flex-col h-[650px] overflow-hidden shadow-2xl relative">
+        
+        <!-- Suggested Quick Prompt Chips -->
+        <div class="px-4 py-2.5 bg-brand-950/80 border-b border-white/10 flex items-center gap-2 overflow-x-auto text-xs">
           <button onclick="sendQuickPrompt('Create an ultra-efficient 5-hour daily timetable for college & LeetCode')" class="px-3 py-1 rounded-full bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 text-indigo-300 whitespace-nowrap">
             ⚡ 5-Hour Daily Timetable
           </button>
-          <button onclick="sendQuickPrompt('Explain Dijkstra and Graph shortest path with an intuitive analogy')" class="px-3 py-1 rounded-full bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/20 text-sky-300 whitespace-nowrap">
-            🧭 Explain Dijkstra Algorithm
+          <button onclick="sendQuickPrompt('What tasks are pending today?')" class="px-3 py-1 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-300 whitespace-nowrap">
+            📋 What tasks are pending today?
           </button>
-          <button onclick="sendQuickPrompt('Give me 3 communication frameworks to sound authoritative in tech interviews')" class="px-3 py-1 rounded-full bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/20 text-purple-300 whitespace-nowrap">
-            🎙️ Tech Interview Communication
+          <button onclick="sendQuickPrompt('Which task should I complete first according to priority?')" class="px-3 py-1 rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 text-amber-300 whitespace-nowrap">
+            🎯 Which task should I complete first?
           </button>
-          <button onclick="sendQuickPrompt('How do I fix weekend habit procrastination according to neuroscience?')" class="px-3 py-1 rounded-full bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-300 whitespace-nowrap">
+          <button onclick="sendQuickPrompt('Add a task to solve 3 LeetCode Tree problems tomorrow at 4 PM')" class="px-3 py-1 rounded-full bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/20 text-purple-300 whitespace-nowrap">
+            ➕ Add a task for tomorrow at 4 PM
+          </button>
+          <button onclick="sendQuickPrompt('How do I fix weekend habit drop-offs according to neuroscience?')" class="px-3 py-1 rounded-full bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-300 whitespace-nowrap">
             🛡️ Fix Weekend Procrastination
           </button>
         </div>
 
-        <!-- Chat Messages Container -->
+        <!-- Chat Messages Scroll Container -->
         <div id="chatMessagesContainer" class="flex-1 p-4 sm:p-6 overflow-y-auto space-y-4">
-          <!-- Populated by JS -->
+          <!-- Injected via JS -->
         </div>
 
         <!-- Chat Input Form -->
         <form onsubmit="handleSendMessage(event)" class="p-3 sm:p-4 border-t border-white/10 bg-brand-900/90 flex items-center gap-2">
-          <input type="text" id="chatInput" placeholder="Ask anything, or request a custom timetable for your daily routine..." 
+          <input type="text" id="chatInput" placeholder="Ask Astra anything or say 'Add a task to submit homework by Friday 5 PM'..." 
             class="flex-1 bg-brand-950 border border-white/15 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-all">
-          <button type="submit" class="px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:brightness-110 active:scale-95 text-white font-bold text-sm shadow-lg shadow-purple-600/30 flex items-center gap-2 transition-all flex-shrink-0">
+          <button type="submit" id="chatSendBtn" class="px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:brightness-110 active:scale-95 text-white font-bold text-sm shadow-lg shadow-purple-600/30 flex items-center gap-2 transition-all flex-shrink-0">
             <span>Send</span>
             <i class="ph-bold ph-paper-plane-right"></i>
           </button>
         </form>
 
       </div>
-
-      <!-- Live Loophole Doctor Diagnostic Findings Board -->
-      <div class="space-y-3 pt-4">
-        <div class="flex items-center justify-between">
-          <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-            <i class="ph-bold ph-detective text-rose-400"></i>
-            Live Habit Matrix Diagnostic Findings (Loophole Doctor)
-          </h3>
-          <button onclick="runLoopholeAudit()" class="px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-mono text-purple-300 border border-purple-400/20 flex items-center gap-1.5 transition-all">
-            <i class="ph-bold ph-cpu"></i> Re-Scan Matrix Cells
-          </button>
-        </div>
-        <div id="loopholeContainer" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <!-- Populated by JS -->
-        </div>
-      </div>
-
-      <!-- Quick AI Timetable Generator Wizard -->
-      <div class="glass-panel rounded-2xl p-6 border border-white/10 space-y-5">
-        <div class="border-b border-white/10 pb-4">
-          <h3 class="text-base font-bold text-white flex items-center gap-2">
-            <i class="ph-bold ph-clock-user text-sky-400"></i>
-            Interactive AI Study Timetable Builder
-          </h3>
-          <p class="text-xs text-slate-400 mt-0.5">Configure your parameters to generate an ultradian rhythm study schedule</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1.5">Target Skill / Subject</label>
-            <input type="text" id="aiInputSkill" value="Data Structures & System Design" 
-              class="w-full bg-brand-950 border border-white/15 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1.5">Daily Available Hours</label>
-            <select id="aiInputHours" class="w-full bg-brand-950 border border-white/15 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
-              <option value="3">3 Hours (Part-Time / College Schedule)</option>
-              <option value="5" selected>5 Hours (Intensive Mastery)</option>
-              <option value="8">8 Hours (Full-Time Bootcamp Pace)</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1.5">Chronotype / Peak Energy</label>
-            <select id="aiInputChronotype" class="w-full bg-brand-950 border border-white/15 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
-              <option value="morning">Morning Larks (07:00 AM - 12:00 PM Peak)</option>
-              <option value="night">Night Owls (08:00 PM - 01:00 AM Peak)</option>
-              <option value="split">Split Shifts (Early Morning + Evening)</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="pt-2 flex flex-wrap items-center gap-3">
-          <button onclick="generateTimetable()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:brightness-110 active:scale-95 text-white font-bold text-xs shadow-lg shadow-purple-600/30 flex items-center gap-2 transition-all">
-            <i class="ph-bold ph-magic-wand text-base"></i> Generate Tailored Schedule
-          </button>
-          <button onclick="injectAITasksToMatrix()" class="px-4 py-2.5 rounded-xl bg-brand-900 border border-purple-500/30 hover:bg-purple-900/20 text-purple-300 font-semibold text-xs flex items-center gap-1.5 transition-all">
-            <i class="ph-bold ph-arrow-down-left"></i> Push Time Blocks as Matrix Habits
-          </button>
-        </div>
-
-        <!-- Rendered Schedule Blocks -->
-        <div id="aiScheduleDisplay" class="pt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <!-- Populated by JS -->
-        </div>
-      </div>
-
     </section>
 
-    <!-- ========================================== -->
-    <!-- VIEW 3: SKILL GROWTH & YOUTUBE MASTERCLASSES -->
-    <!-- ========================================== -->
-    <section id="viewVideos" class="hidden space-y-6">
+    <!-- ==================================================== -->
+    <!-- VIEW 6: PROGRESS, ANALYTICS & 31-DAY MATRIX          -->
+    <!-- ==================================================== -->
+    <section id="viewProgress" class="hidden space-y-6">
       
-      <!-- Top Banner -->
-      <div class="glass-panel rounded-2xl p-6 border-red-500/20 bg-gradient-to-r from-brand-900 via-brand-850 to-red-950/30 flex flex-col md:flex-row items-center justify-between gap-4">
+      <!-- Progress Analytics Overview Header -->
+      <div class="glass-panel-elevated rounded-2xl p-6 border border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/30 text-red-300 text-xs font-semibold mb-2">
-            <i class="ph-fill ph-youtube-logo text-red-500"></i> Dynamic Rotating Skill Boosts & Masterclasses
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-semibold mb-2">
+            <i class="ph-bold ph-chart-line-up text-indigo-400"></i> Performance Analytics & 31-Day Habit Matrix
           </div>
-          <h2 class="text-2xl font-black text-white">Curated YouTube Masterclasses & Field Recommendations</h2>
-          <p class="text-xs sm:text-sm text-slate-300 mt-1 max-w-2xl leading-relaxed">
-            High-yield lectures to accelerate your progress in DSA, System Design, Executive Communication, and Neuroscience. Save videos to your Vault or watch in the studio to unlock high-retention CheatNotes!
-          </p>
+          <h2 class="text-2xl font-black text-white">Productivity Crucible & Habit Compliance</h2>
+          <p class="text-xs sm:text-sm text-slate-400 mt-0.5">Spreadsheet-precision matrix tracking, weekly completion donut charts, and diagnostic audits</p>
         </div>
 
         <div class="flex items-center gap-2">
-          <button onclick="openAddVideoModal()" class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md">
-            <i class="ph-bold ph-plus"></i> Add Any Video URL
-          </button>
-          <button onclick="shuffleVideoRecommendations()" class="px-3.5 py-2 rounded-xl bg-brand-900 border border-white/15 text-slate-300 hover:text-white text-xs font-semibold flex items-center gap-1.5 transition-all">
-            <i class="ph-bold ph-shuffle"></i> Rotate Feed
-          </button>
-        </div>
-      </div>
+          <!-- Month & Year Controls -->
+          <div class="flex items-center bg-brand-900 border border-white/10 rounded-xl p-0.5 text-xs">
+            <select id="monthSelect" onchange="changeCalendarMonth()" class="bg-transparent text-slate-200 font-semibold px-2 py-1 focus:outline-none cursor-pointer text-xs">
+              <option value="0" class="bg-brand-950">Jan</option>
+              <option value="1" class="bg-brand-950">Feb</option>
+              <option value="2" class="bg-brand-950">Mar</option>
+              <option value="3" class="bg-brand-950">Apr</option>
+              <option value="4" class="bg-brand-950">May</option>
+              <option value="5" class="bg-brand-950">Jun</option>
+              <option value="6" class="bg-brand-950">Jul</option>
+              <option value="7" class="bg-brand-950">Aug</option>
+              <option value="8" class="bg-brand-950">Sep</option>
+              <option value="9" class="bg-brand-950">Oct</option>
+              <option value="10" class="bg-brand-950" selected>Nov</option>
+              <option value="11" class="bg-brand-950">Dec</option>
+            </select>
+            <span class="text-white/20">|</span>
+            <select id="yearSelect" onchange="changeCalendarMonth()" class="bg-transparent text-slate-200 font-semibold px-1.5 py-1 focus:outline-none cursor-pointer text-xs">
+              <option value="2025" class="bg-brand-950">2025</option>
+              <option value="2026" class="bg-brand-950" selected>2026</option>
+              <option value="2027" class="bg-brand-950">2027</option>
+            </select>
+          </div>
 
-      <!-- Category Filter Pills -->
-      <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
-        <button id="catAll" onclick="filterVideosByCategory('All')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-indigo-600 text-white border border-indigo-400 shadow-md transition-all">
-          All Masterclasses
-        </button>
-        <button id="catTech" onclick="filterVideosByCategory('Tech')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition-all">
-          DSA & Coding
-        </button>
-        <button id="catSystemDesign" onclick="filterVideosByCategory('SystemDesign')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition-all">
-          System Design & Cloud
-        </button>
-        <button id="catCommunication" onclick="filterVideosByCategory('Communication')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition-all">
-          Communication & Soft Skills
-        </button>
-        <button id="catProductivity" onclick="filterVideosByCategory('Productivity')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition-all">
-          Focus & Neuroscience
-        </button>
-      </div>
-
-      <!-- Videos Grid -->
-      <div id="videosGridContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Injected via JS -->
-      </div>
-
-    </section>
-
-    <!-- ========================================== -->
-    <!-- VIEW 4: LECTURE STUDIO & GATED CHEATNOTES  -->
-    <!-- ========================================== -->
-    <section id="viewPlayer" class="hidden space-y-6">
-      
-      <!-- Video Player Studio Header -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div>
-          <span id="playerVideoCategory" class="text-xs font-mono font-bold uppercase text-purple-400">Communication Masterclass</span>
-          <h2 id="playerVideoTitle" class="text-xl sm:text-2xl font-black text-white mt-0.5">
-            How to Speak So That People Want to Listen
-          </h2>
-          <p id="playerVideoChannel" class="text-xs text-slate-400">TED / Julian Treasure</p>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <button onclick="switchView('videos')" class="px-3.5 py-2 rounded-xl bg-brand-900 border border-white/10 text-slate-300 hover:text-white text-xs font-semibold flex items-center gap-1.5">
-            <i class="ph-bold ph-arrow-left"></i> Back to Feed
-          </button>
-          <button onclick="fastForwardWatchProgress()" title="Simulate 100% completion for review" class="px-3.5 py-2 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 hover:bg-amber-500/30 text-xs font-semibold flex items-center gap-1.5">
-            <i class="ph-bold ph-fast-forward"></i> Instant Test Unlock (100%)
+          <button onclick="openAddHabitModal()" class="px-3.5 py-2 text-xs font-bold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-md flex items-center gap-1.5">
+            <i class="ph-bold ph-plus"></i> Add Habit
           </button>
         </div>
       </div>
 
-      <!-- Main Embedded Player & Progress Meter -->
-      <div class="glass-panel-elevated rounded-2xl p-4 sm:p-6 border border-white/10 space-y-4">
-        
-        <!-- Responsive YouTube Frame -->
-        <div class="relative w-full aspect-video rounded-xl overflow-hidden bg-black shadow-2xl border border-white/10">
-          <iframe id="youtubeIframePlayer" class="w-full h-full" 
-            src="https://www.youtube.com/embed/xLETJpc_80A?enablejsapi=1" 
-            title="YouTube video player" frameborder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-            allowfullscreen>
-          </iframe>
+      <!-- Weekly Donut Charts Carousel Bar -->
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        <!-- Week 1 Donut -->
+        <div class="glass-panel p-3.5 rounded-2xl border border-amber-500/20 bg-brand-900/60 flex flex-col items-center">
+          <span class="text-[10px] font-mono font-bold uppercase text-amber-400">Week 1 (D1-D7)</span>
+          <div class="relative w-20 h-20 my-2">
+            <canvas id="w1DonutChart"></canvas>
+            <span id="w1DonutCenterText" class="absolute inset-0 flex items-center justify-center font-mono font-bold text-xs text-amber-300">0%</span>
+          </div>
+          <span id="w1RatioText" class="text-[11px] font-mono text-slate-300">0/0</span>
         </div>
 
-        <!-- Live Watch Progress Bar -->
-        <div class="space-y-1.5 pt-2">
-          <div class="flex items-center justify-between text-xs font-mono">
-            <span class="text-slate-400 flex items-center gap-1">
-              <i class="ph-bold ph-eye text-purple-400"></i> Video Lecture Progress:
-            </span>
-            <span id="videoProgressPercentLabel" class="text-purple-300 font-bold">0%</span>
+        <!-- Week 2 Donut -->
+        <div class="glass-panel p-3.5 rounded-2xl border border-sky-500/20 bg-brand-900/60 flex flex-col items-center">
+          <span class="text-[10px] font-mono font-bold uppercase text-sky-400">Week 2 (D8-D14)</span>
+          <div class="relative w-20 h-20 my-2">
+            <canvas id="w2DonutChart"></canvas>
+            <span id="w2DonutCenterText" class="absolute inset-0 flex items-center justify-center font-mono font-bold text-xs text-sky-300">0%</span>
           </div>
-          <div class="w-full bg-brand-950 h-3 rounded-full overflow-hidden border border-white/10 p-0.5">
-            <div id="videoProgressBar" class="h-full bg-gradient-to-r from-purple-600 via-indigo-500 to-emerald-400 rounded-full transition-all duration-500" style="width: 0%"></div>
-          </div>
-          <p class="text-[11px] text-slate-500">CheatNotes will automatically unlock once you complete 100% of the video session.</p>
+          <span id="w2RatioText" class="text-[11px] font-mono text-slate-300">0/0</span>
         </div>
 
+        <!-- Week 3 Donut -->
+        <div class="glass-panel p-3.5 rounded-2xl border border-rose-500/20 bg-brand-900/60 flex flex-col items-center">
+          <span class="text-[10px] font-mono font-bold uppercase text-rose-400">Week 3 (D15-D21)</span>
+          <div class="relative w-20 h-20 my-2">
+            <canvas id="w3DonutChart"></canvas>
+            <span id="w3DonutCenterText" class="absolute inset-0 flex items-center justify-center font-mono font-bold text-xs text-rose-300">0%</span>
+          </div>
+          <span id="w3RatioText" class="text-[11px] font-mono text-slate-300">0/0</span>
+        </div>
+
+        <!-- Week 4 Donut -->
+        <div class="glass-panel p-3.5 rounded-2xl border border-emerald-500/20 bg-brand-900/60 flex flex-col items-center">
+          <span class="text-[10px] font-mono font-bold uppercase text-emerald-400">Week 4 (D22-D28)</span>
+          <div class="relative w-20 h-20 my-2">
+            <canvas id="w4DonutChart"></canvas>
+            <span id="w4DonutCenterText" class="absolute inset-0 flex items-center justify-center font-mono font-bold text-xs text-emerald-300">0%</span>
+          </div>
+          <span id="w4RatioText" class="text-[11px] font-mono text-slate-300">0/0</span>
+        </div>
+
+        <!-- Week 5 Donut -->
+        <div class="glass-panel p-3.5 rounded-2xl border border-purple-500/20 bg-brand-900/60 flex flex-col items-center">
+          <span class="text-[10px] font-mono font-bold uppercase text-purple-400">Week 5 (D29-D31)</span>
+          <div class="relative w-20 h-20 my-2">
+            <canvas id="w5DonutChart"></canvas>
+            <span id="w5DonutCenterText" class="absolute inset-0 flex items-center justify-center font-mono font-bold text-xs text-purple-300">0%</span>
+          </div>
+          <span id="w5RatioText" class="text-[11px] font-mono text-slate-300">0/0</span>
+        </div>
+
+        <!-- Total Month Donut -->
+        <div class="glass-panel p-3.5 rounded-2xl border border-indigo-500/30 bg-gradient-to-b from-brand-900 to-indigo-950/40 flex flex-col items-center shadow-lg">
+          <span class="text-[10px] font-mono font-bold uppercase text-indigo-300">Total Month</span>
+          <div class="relative w-20 h-20 my-2">
+            <canvas id="totalMonthDonutChart"></canvas>
+            <span id="totalMonthDonutCenterText" class="absolute inset-0 flex items-center justify-center font-mono font-bold text-xs text-indigo-200">0%</span>
+          </div>
+          <span id="totalMonthRatioText" class="text-[11px] font-mono text-white font-semibold">0/0</span>
+        </div>
       </div>
 
-      <!-- GATED CHEATNOTES AREA -->
-      <div class="space-y-4">
-        
-        <!-- 1. LOCKED VIEW (State when < 100%) -->
-        <div id="cheatNotesLockedView" class="glass-panel-elevated rounded-2xl p-8 border-2 border-dashed border-amber-500/40 text-center space-y-4 relative overflow-hidden">
-          <div class="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 mx-auto flex items-center justify-center text-3xl shadow-xl shadow-amber-500/10">
-            <i class="ph-bold ph-lock-key"></i>
+      <!-- THE 31-DAY SPREADSHEET-PRECISION HABIT MATRIX TABLE -->
+      <div class="glass-panel-elevated rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
+        <div class="p-4 bg-brand-900/90 border-b border-white/10 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i class="ph-bold ph-table text-indigo-400 text-lg"></i>
+            <h3 id="matrixBannerTitle" class="text-sm font-bold text-white">(November) 2026 Habit & Skill Matrix</h3>
           </div>
-          <div class="max-w-md mx-auto space-y-1.5">
-            <h3 class="text-lg font-black text-white">High-Yield CheatNotes & Memory Retention Cards Locked</h3>
-            <p class="text-xs text-slate-300 leading-relaxed">
-              To guarantee deep cognitive retention and prevent passive skimming, watch the full lecture to unlock comprehensive summary cheat sheets, core mental models, and spaced-repetition flashcards.
-            </p>
+          <div class="text-[11px] text-slate-400">Checked days calculate instantly</div>
+        </div>
+
+        <div class="matrix-table-wrap overflow-x-auto">
+          <table class="w-full border-collapse text-xs select-none">
+            <thead>
+              <!-- Row 1: Week Span Headers -->
+              <tr class="text-center font-mono text-[11px] font-bold uppercase border-b border-white/10">
+                <th class="p-2 text-left pl-3 bg-brand-950 text-slate-300 border-r border-white/10 min-w-[170px]">Habit / Skill Track</th>
+                <th colspan="7" class="bg-amber-950/60 text-amber-300 border-r-2 border-white/10">Week 1 (1 - 7)</th>
+                <th colspan="7" class="bg-sky-950/60 text-sky-300 border-r-2 border-white/10">Week 2 (8 - 14)</th>
+                <th colspan="7" class="bg-rose-950/60 text-rose-300 border-r-2 border-white/10">Week 3 (15 - 21)</th>
+                <th colspan="7" class="bg-emerald-950/60 text-emerald-300 border-r-2 border-white/10">Week 4 (22 - 28)</th>
+                <th colspan="3" class="bg-purple-950/60 text-purple-300 border-r-2 border-white/10">Week 5 (29-31)</th>
+                <th class="bg-brand-950 text-amber-300 border-r border-white/10 min-w-[50px]">Goal</th>
+                <th class="bg-brand-950 text-slate-300 border-r border-white/10 min-w-[100px]">Progress</th>
+                <th class="bg-brand-950 text-slate-400 min-w-[40px]">Del</th>
+              </tr>
+              <!-- Row 2: Day Numbers 1 to 31 (Injected via JS) -->
+              <tr id="daysNumberHeaderRow" class="text-center font-mono text-[11px] font-bold border-b border-white/10"></tr>
+              <!-- Row 3: Day of Week S, M, T, W, T, F, S (Injected via JS) -->
+              <tr id="daysOfWeekHeaderRow" class="text-center text-[10px] uppercase font-mono text-slate-400 bg-brand-950/80 border-b border-white/10"></tr>
+            </thead>
+            <tbody id="matrixTableBody" class="divide-y divide-white/5 bg-brand-900/40">
+              <!-- Habit Rows Injected via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Loophole Doctor Diagnostics & Secondary Charts -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Daily Trend Bar Chart -->
+        <div class="glass-panel rounded-2xl p-6 border border-white/10 space-y-3">
+          <h4 class="text-xs font-mono uppercase font-bold text-slate-300 flex items-center gap-2">
+            <i class="ph-bold ph-chart-bar text-indigo-400"></i> Daily Habit Completion Trend (Days 1 - 31)
+          </h4>
+          <div class="h-56 relative">
+            <canvas id="dailyTrendBarChart"></canvas>
           </div>
-          <div class="pt-2">
-            <button onclick="fastForwardWatchProgress()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 hover:brightness-110 text-white font-bold text-xs shadow-lg flex items-center gap-2 mx-auto">
-              <i class="ph-bold ph-fast-forward"></i> Instant Unlock for Demo / Review
+        </div>
+
+        <!-- Loophole Doctor Diagnostic Cards -->
+        <div class="glass-panel rounded-2xl p-6 border border-white/10 space-y-3">
+          <div class="flex items-center justify-between pb-2 border-b border-white/10">
+            <h4 class="text-xs font-mono uppercase font-bold text-rose-400 flex items-center gap-2">
+              <i class="ph-bold ph-detective text-rose-400"></i> Loophole Doctor Diagnostic Audit
+            </h4>
+            <button onclick="runLoopholeAudit()" class="text-xs text-purple-300 hover:text-white font-mono flex items-center gap-1">
+              <i class="ph-bold ph-arrows-clockwise"></i> Re-Scan
             </button>
           </div>
+          <div id="loopholeContainer" class="space-y-3 max-h-56 overflow-y-auto">
+            <!-- Injected via JS -->
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================================================== -->
+    <!-- VIEW 7: SETTINGS & STUDY VAULT                       -->
+    <!-- ==================================================== -->
+    <section id="viewSettings" class="hidden space-y-6">
+      
+      <!-- Settings Header -->
+      <div class="glass-panel-elevated rounded-2xl p-6 border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-500/10 border border-slate-500/30 text-slate-300 text-xs font-semibold mb-2">
+            <i class="ph-bold ph-gear text-slate-400"></i> System Configuration & Learning Vault
+          </div>
+          <h2 class="text-2xl font-black text-white">Settings & Curated Resources</h2>
+          <p class="text-xs sm:text-sm text-slate-400 mt-0.5">Configure Gemini AI, backup and restore data, and access your lecture cheatnotes vault</p>
         </div>
 
-        <!-- 2. UNLOCKED VIEW (State when 100%) -->
-        <div id="cheatNotesUnlockedView" class="hidden glass-panel-elevated rounded-2xl p-6 sm:p-8 border-2 border-emerald-500/40 space-y-6 shadow-2xl relative">
+        <!-- Tab Toggle between Settings and Video Vault -->
+        <div class="flex items-center bg-brand-950 p-1 rounded-xl border border-white/10 text-xs">
+          <button id="btnSettingsSubTabConfig" onclick="toggleSettingsSubTab('config')" class="px-3.5 py-1.5 rounded-lg bg-indigo-600 text-white font-semibold transition-all">
+            Settings & Data
+          </button>
+          <button id="btnSettingsSubTabVault" onclick="toggleSettingsSubTab('vault')" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white font-semibold transition-all">
+            YouTube Masterclasses & Notes
+          </button>
+        </div>
+      </div>
+
+      <!-- Settings Sub-Panel: Configuration & Data -->
+      <div id="settingsSubPanelConfig" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-white/10 gap-3">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center text-2xl shadow-lg">
-                <i class="ph-bold ph-seal-check"></i>
+          <!-- Gemini AI Key Configuration Card -->
+          <div class="glass-panel rounded-2xl p-6 border border-white/10 space-y-4">
+            <div class="flex items-center gap-2.5">
+              <div class="w-9 h-9 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-lg">
+                <i class="ph-bold ph-key"></i>
               </div>
               <div>
-                <h3 class="text-lg font-black text-white">Lecture Mastery CheatNotes & Active Recall Cards</h3>
-                <p class="text-xs text-emerald-300">Unlocked via 100% Lecture Completion • Permanent Retention System</p>
+                <h3 class="text-sm font-bold text-white">Google Gemini API Key</h3>
+                <p class="text-[11px] text-slate-400">Configure your personal key or use server environment variables</p>
               </div>
             </div>
 
-            <div class="flex flex-wrap items-center gap-2">
-              <button onclick="copyCheatNotes()" class="px-3.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-slate-200 flex items-center gap-1.5 transition-all">
-                <i class="ph-bold ph-copy"></i> Copy Notes
-              </button>
-              <button onclick="downloadCheatNotesMarkdown()" class="px-3.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-purple-300 flex items-center gap-1.5 transition-all">
-                <i class="ph-bold ph-download-simple"></i> Download .md
-              </button>
-              <button onclick="addLectureToMatrixHabits()" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md">
-                <i class="ph-bold ph-plus-circle"></i> Add Revision to Matrix
-              </button>
-            </div>
-          </div>
-
-          <!-- Section 1: Executive Synopsis -->
-          <div class="space-y-2">
-            <h4 class="text-xs font-mono uppercase font-bold text-slate-400 tracking-wider">Executive Synopsis</h4>
-            <p id="cheatNotesSynopsis" class="text-sm text-slate-200 leading-relaxed bg-brand-950/70 p-4 rounded-xl border border-white/5">
-              <!-- Injected by JS -->
-            </p>
-          </div>
-
-          <!-- Section 2: Core Principles & Formulas -->
-          <div class="space-y-2">
-            <h4 class="text-xs font-mono uppercase font-bold text-slate-400 tracking-wider">Core Principles & Mental Models</h4>
-            <ul id="cheatNotesPrinciplesList" class="space-y-2 text-xs sm:text-sm text-slate-200 bg-brand-950/70 p-4 rounded-xl border border-white/5">
-              <!-- Injected by JS -->
-            </ul>
-          </div>
-
-          <!-- Section 3: Spaced Retrieval Flashcards -->
-          <div class="space-y-2">
-            <h4 class="text-xs font-mono uppercase font-bold text-purple-300 tracking-wider">Active Recall & Flashcard Quizzes</h4>
-            <div id="cheatNotesFlashcardsContainer" class="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <!-- Injected by JS -->
-            </div>
-          </div>
-
-          <!-- Section 4: Daily Action Drill -->
-          <div class="p-4 rounded-xl bg-gradient-to-r from-purple-950/40 to-indigo-950/40 border border-purple-500/30 flex items-start gap-3">
-            <div class="p-2 rounded-lg bg-purple-500/20 text-purple-300 mt-0.5">
-              <i class="ph-bold ph-lightning text-lg"></i>
-            </div>
-            <div>
-              <span class="text-[11px] font-mono font-bold uppercase text-purple-300">Actionable 24-Hour Implementation Drill</span>
-              <p id="cheatNotesDrill" class="text-xs sm:text-sm text-white font-medium mt-0.5">
-                <!-- Injected by JS -->
+            <div class="space-y-2">
+              <label class="block text-xs font-mono uppercase text-slate-400">Gemini Key (Optional Client Override)</label>
+              <input type="password" id="settingsGeminiKeyInput" placeholder="AIzaSy..." 
+                class="w-full bg-brand-950 border border-white/15 rounded-xl px-4 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-purple-500">
+              <p class="text-[11px] text-slate-400 leading-relaxed">
+                By default, ChronoSprint uses the server-side <code class="text-purple-300">GEMINI_API_KEY</code> configured in Vercel. You can also save a personal key here for direct overrides.
               </p>
             </div>
+
+            <div class="flex items-center gap-2 pt-2">
+              <button onclick="saveSettingsApiKey()" class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold shadow-md transition-all">
+                Save Key
+              </button>
+              <button onclick="testGeminiConnection()" class="px-4 py-2 rounded-xl bg-brand-900 border border-white/15 text-slate-300 hover:text-white text-xs font-semibold transition-all">
+                Test Connection
+              </button>
+            </div>
+            <div id="geminiConnectionStatus" class="text-xs font-mono text-slate-400 hidden"></div>
+          </div>
+
+          <!-- Data Backup, Export & Reset Card -->
+          <div class="glass-panel rounded-2xl p-6 border border-white/10 space-y-4">
+            <div class="flex items-center gap-2.5">
+              <div class="w-9 h-9 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-lg">
+                <i class="ph-bold ph-database"></i>
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-white">Data Management & Backup</h3>
+                <p class="text-[11px] text-slate-400">Export your tasks and schedules or restore from a backup</p>
+              </div>
+            </div>
+
+            <div class="space-y-3 pt-2">
+              <div class="flex items-center justify-between p-3 rounded-xl bg-brand-950/60 border border-white/5">
+                <div>
+                  <h4 class="text-xs font-semibold text-white">Export Complete Backup</h4>
+                  <p class="text-[10px] text-slate-400">Download all your tasks, timetable, and habits as a JSON file</p>
+                </div>
+                <button onclick="exportDataJSON()" class="px-3 py-1.5 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/40 text-indigo-300 text-xs font-semibold transition-all flex items-center gap-1">
+                  <i class="ph-bold ph-download-simple"></i> Export
+                </button>
+              </div>
+
+              <div class="flex items-center justify-between p-3 rounded-xl bg-brand-950/60 border border-white/5">
+                <div>
+                  <h4 class="text-xs font-semibold text-white">Import Backup File</h4>
+                  <p class="text-[10px] text-slate-400">Upload and merge tasks from a previous JSON backup</p>
+                </div>
+                <label class="px-3 py-1.5 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/40 text-emerald-300 text-xs font-semibold transition-all cursor-pointer flex items-center gap-1">
+                  <i class="ph-bold ph-upload-simple"></i> Import
+                  <input type="file" id="importFileInput" onchange="importDataJSON(event)" accept=".json" class="hidden">
+                </label>
+              </div>
+
+              <div class="flex items-center justify-between p-3 rounded-xl bg-brand-950/60 border border-white/5">
+                <div>
+                  <h4 class="text-xs font-semibold text-rose-300">Reset to Sample Template</h4>
+                  <p class="text-[10px] text-slate-400">Restore default high-performance tasks and habits</p>
+                </div>
+                <button onclick="loadSamplePresets()" class="px-3 py-1.5 rounded-lg bg-rose-600/20 hover:bg-rose-600/40 border border-rose-500/40 text-rose-300 text-xs font-semibold transition-all flex items-center gap-1">
+                  <i class="ph-bold ph-arrows-clockwise"></i> Reset
+                </button>
+              </div>
+            </div>
           </div>
 
         </div>
-
       </div>
 
-    </section>
+      <!-- Settings Sub-Panel: YouTube Masterclasses & CheatNotes Vault -->
+      <div id="settingsSubPanelVault" class="hidden space-y-6">
+        <!-- Masterclasses Feed -->
+        <div class="glass-panel rounded-2xl p-6 border border-white/10 space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <i class="ph-fill ph-youtube-logo text-red-500 text-xl"></i> Curated YouTube Skill Masterclasses
+              </h3>
+              <p class="text-xs text-slate-400">High-yield lectures with unlocked cheatnotes and active recall flashcards</p>
+            </div>
+            <button onclick="openAddVideoModal()" class="px-3.5 py-1.5 rounded-xl bg-purple-600 text-white text-xs font-semibold flex items-center gap-1">
+              <i class="ph-bold ph-plus"></i> Add Video URL
+            </button>
+          </div>
 
-    <!-- ========================================== -->
-    <!-- VIEW 5: SAVED LECTURE VAULT (WATCH LATER)  -->
-    <!-- ========================================== -->
-    <section id="viewVault" class="hidden space-y-6">
-      
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 class="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
-            <i class="ph-bold ph-bookmark-simple text-sky-400"></i>
-            Saved Masterclasses & Lecture Vault
-          </h2>
-          <p class="text-xs text-slate-400 mt-0.5">Your personal curated watch-later queue for offline and scheduled study sessions</p>
+          <!-- Category filter for masterclasses -->
+          <div class="flex items-center gap-2 overflow-x-auto text-xs pb-1">
+            <button id="catAll" onclick="filterVideosByCategory('All')" class="px-3 py-1 rounded-lg bg-indigo-600 text-white font-semibold">All</button>
+            <button id="catTech" onclick="filterVideosByCategory('Tech')" class="px-3 py-1 rounded-lg bg-brand-900 border border-white/10 text-slate-300">Coding</button>
+            <button id="catSystemDesign" onclick="filterVideosByCategory('SystemDesign')" class="px-3 py-1 rounded-lg bg-brand-900 border border-white/10 text-slate-300">System Design</button>
+            <button id="catCommunication" onclick="filterVideosByCategory('Communication')" class="px-3 py-1 rounded-lg bg-brand-900 border border-white/10 text-slate-300">Communication</button>
+            <button id="catProductivity" onclick="filterVideosByCategory('Productivity')" class="px-3 py-1 rounded-lg bg-brand-900 border border-white/10 text-slate-300">Neuroscience</button>
+          </div>
+
+          <div id="videosGridContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Injected via JS -->
+          </div>
         </div>
 
-        <button onclick="switchView('videos')" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow-md flex items-center gap-1.5">
-          <i class="ph-bold ph-plus"></i> Browse More Masterclasses
-        </button>
-      </div>
-
-      <div id="savedVaultGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Injected via JS -->
-      </div>
-
-    </section>
-
-    <!-- ========================================== -->
-    <!-- VIEW 6: WEEKLY SPRINTS & GOALS -->
-    <!-- ========================================== -->
-    <section id="viewGoals" class="hidden space-y-6">
-      
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 class="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
-            <i class="ph-bold ph-target text-emerald-400"></i>
-            Weekly Sprints & Monthly Milestone Targets
-          </h2>
-          <p class="text-xs text-slate-400 mt-0.5">Tie your daily habits into larger weekly and monthly deliverables</p>
-        </div>
-        <button onclick="openAddGoalModal()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-md flex items-center gap-1.5">
-          <i class="ph-bold ph-plus"></i> Add New Target
-        </button>
-      </div>
-
-      <!-- Weekly Sprints Grid -->
-      <div class="space-y-3">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Weekly Sprint Targets</h3>
-        <div id="weeklyGoalsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <!-- Injected via JS -->
-        </div>
-      </div>
-
-      <!-- Monthly Macro Targets Grid -->
-      <div class="space-y-3 pt-4 border-t border-white/10">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Monthly Benchmark Milestones</h3>
-        <div id="monthlyGoalsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <!-- Injected via JS -->
+        <!-- Saved Vault Queue -->
+        <div class="glass-panel rounded-2xl p-6 border border-white/10 space-y-4">
+          <h3 class="text-base font-bold text-white flex items-center gap-2">
+            <i class="ph-bold ph-bookmark-simple text-sky-400 text-xl"></i> My Saved Watch Later Vault
+          </h3>
+          <div id="savedVaultGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Injected via JS -->
+          </div>
         </div>
       </div>
 
@@ -991,33 +1040,33 @@
   </main>
 
   <!-- ==================================================== -->
-  <!-- MOBILE BOTTOM APP NAVIGATION BAR (NATIVE APP FEEL)   -->
+  <!-- MOBILE BOTTOM APP NAVIGATION BAR                     -->
   <!-- ==================================================== -->
   <nav class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-brand-950/95 border-t border-white/10 backdrop-blur-xl px-2 py-2 mobile-bottom-bar flex items-center justify-around text-[10px]">
-    <button id="mobTabMatrix" onclick="switchView('matrix')" class="flex flex-col items-center gap-1 text-purple-400 font-bold transition-all">
-      <i class="ph-bold ph-grid-four text-lg"></i>
-      <span>Matrix</span>
+    <button id="mobTabDashboard" onclick="switchView('dashboard')" class="flex flex-col items-center gap-1 text-indigo-400 font-bold transition-all">
+      <i class="ph-bold ph-squares-four text-lg"></i>
+      <span>Dashboard</span>
+    </button>
+    <button id="mobTabTimetable" onclick="switchView('timetable')" class="flex flex-col items-center gap-1 text-slate-400 transition-all">
+      <i class="ph-bold ph-clock text-lg"></i>
+      <span>Timetable</span>
+    </button>
+    <button id="mobTabTasks" onclick="switchView('tasks')" class="flex flex-col items-center gap-1 text-slate-400 transition-all relative">
+      <i class="ph-bold ph-check-square-offset text-lg"></i>
+      <span>Tasks</span>
+      <span id="mobPendingBadge" class="absolute -top-1 -right-2 px-1 rounded-full text-[9px] bg-emerald-500 text-white font-mono">0</span>
+    </button>
+    <button id="mobTabCalendar" onclick="switchView('calendar')" class="flex flex-col items-center gap-1 text-slate-400 transition-all">
+      <i class="ph-bold ph-calendar text-lg"></i>
+      <span>Calendar</span>
     </button>
     <button id="mobTabAI" onclick="switchView('ai')" class="flex flex-col items-center gap-1 text-slate-400 transition-all">
       <i class="ph-bold ph-sparkle text-lg"></i>
       <span>Astra AI</span>
     </button>
-    <button id="mobTabVideos" onclick="switchView('videos')" class="flex flex-col items-center gap-1 text-slate-400 transition-all">
-      <i class="ph-bold ph-youtube-logo text-lg"></i>
-      <span>Skills</span>
-    </button>
-    <button id="mobTabPlayer" onclick="switchView('player')" class="flex flex-col items-center gap-1 text-slate-400 transition-all">
-      <i class="ph-bold ph-play-circle text-lg"></i>
-      <span>Studio</span>
-    </button>
-    <button id="mobTabVault" onclick="switchView('vault')" class="flex flex-col items-center gap-1 text-slate-400 transition-all relative">
-      <i class="ph-bold ph-bookmark-simple text-lg"></i>
-      <span>Vault</span>
-      <span id="mobVaultCountBadge" class="absolute -top-1 -right-2 px-1 rounded-full text-[9px] bg-sky-500 text-white font-mono">0</span>
-    </button>
-    <button id="mobTabGoals" onclick="switchView('goals')" class="flex flex-col items-center gap-1 text-slate-400 transition-all">
-      <i class="ph-bold ph-target text-lg"></i>
-      <span>Goals</span>
+    <button id="mobTabProgress" onclick="switchView('progress')" class="flex flex-col items-center gap-1 text-slate-400 transition-all">
+      <i class="ph-bold ph-chart-line-up text-lg"></i>
+      <span>Progress</span>
     </button>
   </nav>
 
@@ -1025,12 +1074,181 @@
   <!-- MODALS & CONFIGURATION DIALOGS                       -->
   <!-- ==================================================== -->
 
-  <!-- ADD HABIT MODAL -->
+  <!-- 1. DUAL ADD / EDIT TASK MODAL -->
+  <div id="taskModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden px-4">
+    <div class="glass-panel-elevated bg-brand-900 border border-white/20 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+      <div class="flex items-center justify-between pb-3 border-b border-white/10">
+        <h3 id="taskModalTitle" class="text-base font-bold text-white flex items-center gap-2">
+          <i class="ph-bold ph-check-square-offset text-indigo-400"></i> Create New Task
+        </h3>
+        <button onclick="closeTaskModal()" class="text-slate-400 hover:text-white text-lg">
+          <i class="ph-bold ph-x"></i>
+        </button>
+      </div>
+
+      <form onsubmit="handleSaveTask(event)" class="space-y-4 mt-4">
+        <div>
+          <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Task Title <span class="text-rose-400">*</span></label>
+          <input type="text" id="taskFormTitle" required placeholder="e.g. Solve 3 LeetCode Mediums on Trees" 
+            class="w-full bg-brand-950 border border-white/15 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Category</label>
+            <select id="taskFormCategory" class="w-full bg-brand-950 border border-white/15 rounded-xl px-3 py-2.5 text-xs text-white">
+              <option value="Study">Study & DSA</option>
+              <option value="Work">Work & Engineering</option>
+              <option value="Health">Health & Fitness</option>
+              <option value="Personal">Personal & Life</option>
+              <option value="Project">Project & Code</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Priority</label>
+            <select id="taskFormPriority" class="w-full bg-brand-950 border border-white/15 rounded-xl px-3 py-2.5 text-xs text-white">
+              <option value="High">🔴 High Priority</option>
+              <option value="Medium" selected>🟡 Medium Priority</option>
+              <option value="Low">🟢 Low Priority</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Date <span class="text-rose-400">*</span></label>
+            <input type="date" id="taskFormDate" required
+              class="w-full bg-brand-950 border border-white/15 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Deadline Time (Optional)</label>
+            <input type="time" id="taskFormDeadline"
+              class="w-full bg-brand-950 border border-white/15 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Start Time (Optional)</label>
+            <input type="time" id="taskFormStartTime"
+              class="w-full bg-brand-950 border border-white/15 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">End Time (Optional)</label>
+            <input type="time" id="taskFormEndTime"
+              class="w-full bg-brand-950 border border-white/15 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Description / Notes</label>
+          <textarea id="taskFormDescription" rows="2" placeholder="Sub-tasks, links, resources or instructions..."
+            class="w-full bg-brand-950 border border-white/15 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"></textarea>
+        </div>
+
+        <div class="pt-3 flex justify-end gap-2">
+          <button type="button" onclick="closeTaskModal()" class="px-4 py-2 text-xs font-semibold rounded-xl bg-brand-800 text-slate-300 hover:text-white">Cancel</button>
+          <button type="submit" class="px-5 py-2 text-xs font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg">Save Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. CONFIRM DELETE TASK MODAL -->
+  <div id="deleteTaskModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden px-4">
+    <div class="glass-panel-elevated bg-brand-900 border border-rose-500/30 rounded-2xl w-full max-w-sm p-6 shadow-2xl relative text-center space-y-4">
+      <div class="w-12 h-12 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center text-2xl mx-auto">
+        <i class="ph-bold ph-trash"></i>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-white">Delete This Task?</h3>
+        <p id="deleteTaskModalTitle" class="text-xs text-slate-300 mt-1">This action cannot be undone.</p>
+      </div>
+      <div class="flex justify-center gap-3 pt-2">
+        <button onclick="closeDeleteTaskModal()" class="px-4 py-2 text-xs font-semibold rounded-xl bg-brand-800 text-slate-300 hover:text-white">Cancel</button>
+        <button onclick="confirmDeleteTask()" class="px-4 py-2 text-xs font-semibold rounded-xl bg-rose-600 hover:bg-rose-500 text-white shadow-lg">Delete Permanently</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. ADD / EDIT TIMETABLE BLOCK MODAL -->
+  <div id="timetableModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden px-4">
+    <div class="glass-panel-elevated bg-brand-900 border border-white/20 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+      <div class="flex items-center justify-between pb-3 border-b border-white/10">
+        <h3 id="timetableModalHeading" class="text-base font-bold text-white flex items-center gap-2">
+          <i class="ph-bold ph-clock text-sky-400"></i> Add Schedule Block
+        </h3>
+        <button onclick="closeTimetableModal()" class="text-slate-400 hover:text-white text-lg">
+          <i class="ph-bold ph-x"></i>
+        </button>
+      </div>
+
+      <form onsubmit="handleSaveTimetable(event)" class="space-y-4 mt-4">
+        <div>
+          <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Activity / Subject Title <span class="text-rose-400">*</span></label>
+          <input type="text" id="ttFormTitle" required placeholder="e.g. Algorithm Mastery & Crucible Focus" 
+            class="w-full bg-brand-950 border border-white/15 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-sky-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Day of Week</label>
+            <select id="ttFormDay" class="w-full bg-brand-950 border border-white/15 rounded-xl px-3 py-2.5 text-xs text-white">
+              <option value="Daily" selected>Daily (All Days)</option>
+              <option value="Monday">Monday</option>
+              <option value="Tuesday">Tuesday</option>
+              <option value="Wednesday">Wednesday</option>
+              <option value="Thursday">Thursday</option>
+              <option value="Friday">Friday</option>
+              <option value="Saturday">Saturday</option>
+              <option value="Sunday">Sunday</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Activity Type</label>
+            <select id="ttFormType" class="w-full bg-brand-950 border border-white/15 rounded-xl px-3 py-2.5 text-xs text-white">
+              <option value="Study" selected>🧠 Deep Study</option>
+              <option value="Work">💻 Work / Project</option>
+              <option value="Lecture">📚 College Lecture</option>
+              <option value="Break">☕ Rest / Meal Break</option>
+              <option value="Fitness">🏋️ Fitness & Recharge</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Start Time (24h) <span class="text-rose-400">*</span></label>
+            <input type="time" id="ttFormStartTime" required value="08:00"
+              class="w-full bg-brand-950 border border-white/15 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">End Time (24h) <span class="text-rose-400">*</span></label>
+            <input type="time" id="ttFormEndTime" required value="10:00"
+              class="w-full bg-brand-950 border border-white/15 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Notes / Target</label>
+          <input type="text" id="ttFormNotes" placeholder="e.g. Focus on graph algorithms & binary search"
+            class="w-full bg-brand-950 border border-white/15 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-sky-500">
+        </div>
+
+        <div class="pt-3 flex justify-end gap-2">
+          <button type="button" onclick="closeTimetableModal()" class="px-4 py-2 text-xs font-semibold rounded-xl bg-brand-800 text-slate-300 hover:text-white">Cancel</button>
+          <button type="submit" class="px-5 py-2 text-xs font-semibold rounded-xl bg-sky-600 hover:bg-sky-500 text-white shadow-lg">Save Block</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. ADD HABIT MODAL (FOR 31-DAY MATRIX) -->
   <div id="addHabitModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden px-4">
     <div class="glass-panel-elevated bg-brand-900 border border-white/20 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
         <h3 class="text-base font-bold text-white flex items-center gap-2">
-          <i class="ph-bold ph-check-square-offset text-purple-400"></i> New Habit or Skill Task
+          <i class="ph-bold ph-table text-indigo-400"></i> New Habit for 31-Day Matrix
         </h3>
         <button onclick="closeAddHabitModal()" class="text-slate-400 hover:text-white text-lg">
           <i class="ph-bold ph-x"></i>
@@ -1039,8 +1257,8 @@
 
       <form onsubmit="handleCreateHabit(event)" class="space-y-4 mt-4">
         <div>
-          <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Habit / Task Title</label>
-          <input type="text" id="habitInputName" required placeholder="e.g. Solve 2 LeetCode Mediums" 
+          <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Habit Title</label>
+          <input type="text" id="habitInputName" required placeholder="e.g. 20 Mins Anki Flashcard Review" 
             class="w-full bg-brand-950 border border-white/15 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
         </div>
 
@@ -1069,54 +1287,12 @@
     </div>
   </div>
 
-  <!-- ADD GOAL MODAL -->
-  <div id="addGoalModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden px-4">
-    <div class="glass-panel-elevated bg-brand-900 border border-white/20 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
-      <div class="flex items-center justify-between pb-3 border-b border-white/10">
-        <h3 class="text-base font-bold text-white flex items-center gap-2">
-          <i class="ph-bold ph-target text-emerald-400"></i> Add Milestone Goal
-        </h3>
-        <button onclick="closeAddGoalModal()" class="text-slate-400 hover:text-white text-lg">
-          <i class="ph-bold ph-x"></i>
-        </button>
-      </div>
-
-      <form onsubmit="handleCreateGoal(event)" class="space-y-4 mt-4">
-        <div>
-          <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Goal Description</label>
-          <input type="text" id="goalInputTitle" required placeholder="e.g. Master Binary Trees & Dynamic Programming" 
-            class="w-full bg-brand-950 border border-white/15 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500">
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Horizon Type</label>
-            <select id="goalInputType" class="w-full bg-brand-950 border border-white/15 rounded-xl px-3 py-2.5 text-xs text-white">
-              <option value="weekly">Weekly Sprint</option>
-              <option value="monthly">Monthly Milestone</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Target Quantity</label>
-            <input type="number" id="goalInputTarget" min="1" max="100" value="10" 
-              class="w-full bg-brand-950 border border-white/15 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
-          </div>
-        </div>
-
-        <div class="pt-3 flex justify-end gap-2">
-          <button type="button" onclick="closeAddGoalModal()" class="px-4 py-2 text-xs font-semibold rounded-xl bg-brand-800 text-slate-300 hover:text-white">Cancel</button>
-          <button type="submit" class="px-5 py-2 text-xs font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg">Save Goal</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- ADD CUSTOM YOUTUBE VIDEO MODAL -->
+  <!-- 5. ADD CUSTOM YOUTUBE VIDEO MODAL -->
   <div id="addVideoModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden px-4">
     <div class="glass-panel-elevated bg-brand-900 border border-white/20 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
         <h3 class="text-base font-bold text-white flex items-center gap-2">
-          <i class="ph-bold ph-youtube-logo text-red-500"></i> Add YouTube Lecture
+          <i class="ph-fill ph-youtube-logo text-red-500"></i> Add YouTube Masterclass
         </h3>
         <button onclick="closeAddVideoModal()" class="text-slate-400 hover:text-white text-lg">
           <i class="ph-bold ph-x"></i>
@@ -1125,48 +1301,46 @@
 
       <form onsubmit="handleCreateCustomVideo(event)" class="space-y-4 mt-4">
         <div>
-          <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">YouTube Video URL or ID</label>
+          <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">YouTube URL or Video ID</label>
           <input type="text" id="customVideoUrl" required placeholder="https://www.youtube.com/watch?v=..." 
-            class="w-full bg-brand-950 border border-white/15 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500">
+            class="w-full bg-brand-950 border border-white/15 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-purple-500 font-mono">
         </div>
-
         <div>
           <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Lecture Title</label>
           <input type="text" id="customVideoTitle" required placeholder="e.g. Dynamic Programming Memoization" 
-            class="w-full bg-brand-950 border border-white/15 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500">
+            class="w-full bg-brand-950 border border-white/15 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-purple-500">
         </div>
-
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Category</label>
-            <select id="customVideoCategory" class="w-full bg-brand-950 border border-white/15 rounded-xl px-3 py-2.5 text-xs text-white">
-              <option value="Tech">DSA & Tech</option>
-              <option value="SystemDesign">System Design</option>
+            <select id="customVideoCategory" class="w-full bg-brand-950 border border-white/15 rounded-xl px-3 py-2 text-xs text-white">
+              <option value="Tech">Coding & Algorithms</option>
+              <option value="SystemDesign">System Design & Cloud</option>
               <option value="Communication">Communication</option>
-              <option value="Productivity">Productivity</option>
+              <option value="Productivity">Neuroscience & Focus</option>
             </select>
           </div>
           <div>
-            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Channel / Speaker</label>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Channel Name</label>
             <input type="text" id="customVideoChannel" placeholder="e.g. MIT OpenCourseWare" 
-              class="w-full bg-brand-950 border border-white/15 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-purple-500">
+              class="w-full bg-brand-950 border border-white/15 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500">
           </div>
         </div>
 
         <div class="pt-3 flex justify-end gap-2">
           <button type="button" onclick="closeAddVideoModal()" class="px-4 py-2 text-xs font-semibold rounded-xl bg-brand-800 text-slate-300 hover:text-white">Cancel</button>
-          <button type="submit" class="px-5 py-2 text-xs font-semibold rounded-xl bg-purple-600 hover:bg-purple-500 text-white shadow-lg">Track Lecture</button>
+          <button type="submit" class="px-5 py-2 text-xs font-semibold rounded-xl bg-purple-600 hover:bg-purple-500 text-white shadow-lg">Add to Masterclasses</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- API KEY SETTINGS MODAL -->
+  <!-- 6. API KEY SETTINGS MODAL -->
   <div id="apiKeyModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden px-4">
     <div class="glass-panel-elevated bg-brand-900 border border-white/20 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
         <h3 class="text-base font-bold text-white flex items-center gap-2">
-          <i class="ph-bold ph-key text-purple-400"></i> AI Intelligence Engine Setup
+          <i class="ph-bold ph-key text-purple-400"></i> Configure Google Gemini API Key
         </h3>
         <button onclick="closeApiKeyModal()" class="text-slate-400 hover:text-white text-lg">
           <i class="ph-bold ph-x"></i>
@@ -1175,17 +1349,17 @@
 
       <form onsubmit="saveApiKey(event)" class="space-y-4 mt-4">
         <div>
-          <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Gemini API Key (Optional)</label>
+          <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Gemini API Key</label>
           <input type="password" id="geminiApiKeyInput" placeholder="AIzaSy..." 
-            class="w-full bg-brand-950 border border-white/15 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500 font-mono">
+            class="w-full bg-brand-950 border border-white/15 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-purple-500 font-mono">
           <p class="text-[11px] text-slate-400 mt-1.5 leading-relaxed">
-            By default, ChronoSprint uses Astra's built-in offline intelligence engine. If you provide a Google Gemini API Key, queries will connect directly to Gemini 1.5 Flash for unlimited live reasoning.
+            Configure <code class="text-purple-300">GEMINI_API_KEY</code> in Vercel Environment Variables, or save your key here for local/client sessions.
           </p>
         </div>
 
         <div class="pt-3 flex justify-end gap-2">
           <button type="button" onclick="closeApiKeyModal()" class="px-4 py-2 text-xs font-semibold rounded-xl bg-brand-800 text-slate-300 hover:text-white">Cancel</button>
-          <button type="submit" class="px-5 py-2 text-xs font-semibold rounded-xl bg-purple-600 hover:bg-purple-500 text-white shadow-lg">Save Settings</button>
+          <button type="submit" class="px-5 py-2 text-xs font-semibold rounded-xl bg-purple-600 hover:bg-purple-500 text-white shadow-lg">Save Key</button>
         </div>
       </form>
     </div>
