@@ -22,29 +22,24 @@ const MIME_TYPES = {
   '.ttf': 'font/ttf'
 };
 
-const server = http.createServer((req, res) => {
-  // Normalize URL
-  let parsedUrl = new URL(req.url, `http://${req.headers.host}`);
+function requestHandler(req, res) {
+  let parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   let pathname = parsedUrl.pathname;
   if (pathname === '/') {
     pathname = '/index.html';
   }
 
-  // Handle /public folder fallback
   let filePath = path.join(__dirname, pathname);
 
   if (!fs.existsSync(filePath)) {
-    // Try public directory
     const publicPath = path.join(__dirname, 'public', pathname);
     if (fs.existsSync(publicPath)) {
       filePath = publicPath;
     } else {
-      // Fallback to index.html for SPA routing
       filePath = path.join(__dirname, 'index.html');
     }
   }
 
-  // Check if directory
   try {
     const stats = fs.statSync(filePath);
     if (stats.isDirectory()) {
@@ -69,7 +64,6 @@ const server = http.createServer((req, res) => {
       return;
     }
 
-    // Cache-Control headers
     const headers = {
       'Content-Type': contentType,
       'Access-Control-Allow-Origin': '*'
@@ -84,11 +78,20 @@ const server = http.createServer((req, res) => {
     res.writeHead(200, headers);
     res.end(content);
   });
-});
+}
 
-server.listen(PORT, () => {
-  console.log(`====================================================`);
-  console.log(`🚀 ChronoSprint App is running at http://localhost:${PORT}`);
-  console.log(`⚡ Real-Time PWA & AI Timetable Engine Ready`);
-  console.log(`====================================================`);
-});
+const server = http.createServer(requestHandler);
+
+if (require.main === module) {
+  server.listen(PORT, () => {
+    console.log(`====================================================`);
+    console.log(`🚀 ChronoSprint App is running at http://localhost:${PORT}`);
+    console.log(`⚡ Real-Time PWA & AI Timetable Engine Ready`);
+    console.log(`====================================================`);
+  });
+}
+
+// Support Vercel Serverless Function invocation if treated as a function
+module.exports = (req, res) => {
+  requestHandler(req, res);
+};
