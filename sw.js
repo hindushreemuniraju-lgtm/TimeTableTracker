@@ -4,7 +4,7 @@ const STATIC_ASSETS = [
   './',
   './index.html',
   './styles.css',
-  './app.js',
+  './chrono-app.js',
   './manifest.json',
   './icon-192.svg',
   './icon-512.svg'
