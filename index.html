@@ -325,14 +325,96 @@
                 </th>
               </tr>
 
-              <!-- Row 2: Days Numbers 1-31 (Dynamically synchronized with calendar month) -->
+              <!-- Row 2: Days Numbers 1-31 (All 31 Columns Present & Preserved) -->
               <tr id="daysNumberHeaderRow" class="text-center font-mono text-[11px] font-bold border-b border-white/10">
-                <!-- Injected and updated dynamically by JS based on actual month/year -->
+                <!-- Week 1 Days (1-7) -->
+                <th class="w-8 py-1.5 bg-amber-950/40 text-amber-300 border-r border-white/5">1</th>
+                <th class="w-8 py-1.5 bg-amber-950/40 text-amber-300 border-r border-white/5">2</th>
+                <th class="w-8 py-1.5 bg-amber-950/40 text-amber-300 border-r border-white/5">3</th>
+                <th class="w-8 py-1.5 bg-gradient-to-b from-indigo-600 to-purple-600 text-white font-black ring-2 ring-purple-400 border-r border-white/5 shadow-lg shadow-purple-500/30" title="TODAY: Wednesday, Nov 4">4</th>
+                <th class="w-8 py-1.5 bg-amber-950/40 text-amber-300 border-r border-white/5">5</th>
+                <th class="w-8 py-1.5 bg-amber-950/40 text-amber-300 border-r border-white/5">6</th>
+                <th class="w-8 py-1.5 bg-amber-950/40 text-amber-300 border-r border-white/10">7</th>
+
+                <!-- Week 2 Days (8-14) -->
+                <th class="w-8 py-1.5 bg-sky-950/40 text-sky-300 border-r border-white/5">8</th>
+                <th class="w-8 py-1.5 bg-sky-950/40 text-sky-300 border-r border-white/5">9</th>
+                <th class="w-8 py-1.5 bg-sky-950/40 text-sky-300 border-r border-white/5">10</th>
+                <th class="w-8 py-1.5 bg-sky-950/40 text-sky-300 border-r border-white/5">11</th>
+                <th class="w-8 py-1.5 bg-sky-950/40 text-sky-300 border-r border-white/5">12</th>
+                <th class="w-8 py-1.5 bg-sky-950/40 text-sky-300 border-r border-white/5">13</th>
+                <th class="w-8 py-1.5 bg-sky-950/40 text-sky-300 border-r border-white/10">14</th>
+
+                <!-- Week 3 Days (15-21) -->
+                <th class="w-8 py-1.5 bg-rose-950/40 text-rose-300 border-r border-white/5">15</th>
+                <th class="w-8 py-1.5 bg-rose-950/40 text-rose-300 border-r border-white/5">16</th>
+                <th class="w-8 py-1.5 bg-rose-950/40 text-rose-300 border-r border-white/5">17</th>
+                <th class="w-8 py-1.5 bg-rose-950/40 text-rose-300 border-r border-white/5">18</th>
+                <th class="w-8 py-1.5 bg-rose-950/40 text-rose-300 border-r border-white/5">19</th>
+                <th class="w-8 py-1.5 bg-rose-950/40 text-rose-300 border-r border-white/5">20</th>
+                <th class="w-8 py-1.5 bg-rose-950/40 text-rose-300 border-r border-white/10">21</th>
+
+                <!-- Week 4 Days (22-28) -->
+                <th class="w-8 py-1.5 bg-emerald-950/40 text-emerald-300 border-r border-white/5">22</th>
+                <th class="w-8 py-1.5 bg-emerald-950/40 text-emerald-300 border-r border-white/5">23</th>
+                <th class="w-8 py-1.5 bg-emerald-950/40 text-emerald-300 border-r border-white/5">24</th>
+                <th class="w-8 py-1.5 bg-emerald-950/40 text-emerald-300 border-r border-white/5">25</th>
+                <th class="w-8 py-1.5 bg-emerald-950/40 text-emerald-300 border-r border-white/5">26</th>
+                <th class="w-8 py-1.5 bg-emerald-950/40 text-emerald-300 border-r border-white/5">27</th>
+                <th class="w-8 py-1.5 bg-emerald-950/40 text-emerald-300 border-r border-white/10">28</th>
+
+                <!-- Week 5 Days (29-31) -->
+                <th class="w-8 py-1.5 bg-purple-950/40 text-purple-300 border-r border-white/5">29</th>
+                <th class="w-8 py-1.5 bg-purple-950/40 text-purple-300 border-r border-white/5">30</th>
+                <th class="w-8 py-1.5 bg-purple-950/40 text-purple-300 border-r border-white/10">31</th>
               </tr>
 
-              <!-- Row 3: Days of Week (Dynamically synchronized with real calendar days) -->
+              <!-- Row 3: Days of Week (Synchronized with Real Dates: Nov 1 = Sun -> Day 4 = Wed) -->
               <tr id="daysOfWeekHeaderRow" class="text-center text-[10px] uppercase font-mono text-slate-400 bg-brand-950/80 border-b border-white/10">
-                <!-- Injected and updated dynamically by JS based on actual month/year -->
+                <th class="p-1.5 text-left pl-3 text-slate-400 font-normal">Day of Week</th>
+
+                <!-- Week 1: 1=Sun(S), 2=Mon(M), 3=Tue(T), 4=Wed(W), 5=Thu(T), 6=Fri(F), 7=Sat(S) -->
+                <th class="border-r border-white/5 text-amber-400 font-bold" title="Sunday, Nov 1">S</th>
+                <th class="border-r border-white/5" title="Monday, Nov 2">M</th>
+                <th class="border-r border-white/5" title="Tuesday, Nov 3">T</th>
+                <th class="border-r border-white/5 bg-indigo-600 text-white font-black ring-2 ring-purple-400" title="TODAY: Wednesday, Nov 4">W</th>
+                <th class="border-r border-white/5" title="Thursday, Nov 5">T</th>
+                <th class="border-r border-white/5" title="Friday, Nov 6">F</th>
+                <th class="border-r border-white/10 text-amber-400 font-bold" title="Saturday, Nov 7">S</th>
+
+                <!-- Week 2: 8=Sun(S), 9=Mon(M), 10=Tue(T), 11=Wed(W), 12=Thu(T), 13=Fri(F), 14=Sat(S) -->
+                <th class="border-r border-white/5 text-sky-400 font-bold" title="Sunday, Nov 8">S</th>
+                <th class="border-r border-white/5" title="Monday, Nov 9">M</th>
+                <th class="border-r border-white/5" title="Tuesday, Nov 10">T</th>
+                <th class="border-r border-white/5" title="Wednesday, Nov 11">W</th>
+                <th class="border-r border-white/5" title="Thursday, Nov 12">T</th>
+                <th class="border-r border-white/5" title="Friday, Nov 13">F</th>
+                <th class="border-r border-white/10 text-sky-400 font-bold" title="Saturday, Nov 14">S</th>
+
+                <!-- Week 3: 15=Sun(S), 16=Mon(M), 17=Tue(T), 18=Wed(W), 19=Thu(T), 20=Fri(F), 21=Sat(S) -->
+                <th class="border-r border-white/5 text-rose-400 font-bold" title="Sunday, Nov 15">S</th>
+                <th class="border-r border-white/5" title="Monday, Nov 16">M</th>
+                <th class="border-r border-white/5" title="Tuesday, Nov 17">T</th>
+                <th class="border-r border-white/5" title="Wednesday, Nov 18">W</th>
+                <th class="border-r border-white/5" title="Thursday, Nov 19">T</th>
+                <th class="border-r border-white/5" title="Friday, Nov 20">F</th>
+                <th class="border-r border-white/10 text-rose-400 font-bold" title="Saturday, Nov 21">S</th>
+
+                <!-- Week 4: 22=Sun(S), 23=Mon(M), 24=Tue(T), 25=Wed(W), 26=Thu(T), 27=Fri(F), 28=Sat(S) -->
+                <th class="border-r border-white/5 text-emerald-400 font-bold" title="Sunday, Nov 22">S</th>
+                <th class="border-r border-white/5" title="Monday, Nov 23">M</th>
+                <th class="border-r border-white/5" title="Tuesday, Nov 24">T</th>
+                <th class="border-r border-white/5" title="Wednesday, Nov 25">W</th>
+                <th class="border-r border-white/5" title="Thursday, Nov 26">T</th>
+                <th class="border-r border-white/5" title="Friday, Nov 27">F</th>
+                <th class="border-r border-white/10 text-emerald-400 font-bold" title="Saturday, Nov 28">S</th>
+
+                <!-- Week 5: 29=Sun(S), 30=Mon(M), 31=Tue(T) -->
+                <th class="border-r border-white/5 text-purple-400 font-bold" title="Sunday, Nov 29">S</th>
+                <th class="border-r border-white/5" title="Monday, Nov 30">M</th>
+                <th class="border-r border-white/10" title="Tuesday, Nov 31">T</th>
+
+                <th class="border-r border-white/10"></th><th class="border-r border-white/10"></th><th></th>
               </tr>
             </thead>
 
