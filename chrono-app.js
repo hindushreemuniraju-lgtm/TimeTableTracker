@@ -261,19 +261,21 @@ const soundFX = {
 // 3. PERSISTENCE & INITIALIZATION
 // ==========================================
 window.addEventListener('DOMContentLoaded', () => {
-  loadAppData();
-  renderMatrixCalendarHeaders();
-  renderMatrixTable();
-  initDonutCharts();
-  initSecondaryCharts();
-  updateAllCalculationsAndCharts();
-  renderVideosFeed();
-  renderSavedVideosVault();
-  runLoopholeAudit();
-  generateTimetable();
-  initMascot();
-  initRealtimeClock();
-  initPWAInstallPrompt();
+  try { loadAppData(); } catch (e) { console.error('loadAppData error:', e); }
+  try { renderMatrixCalendarHeaders(); } catch (e) { console.error('renderMatrixCalendarHeaders error:', e); }
+  try { renderMatrixTable(); } catch (e) { console.error('renderMatrixTable error:', e); }
+  try { initDonutCharts(); } catch (e) { console.error('initDonutCharts error:', e); }
+  try { initSecondaryCharts(); } catch (e) { console.error('initSecondaryCharts error:', e); }
+  try { updateAllCalculationsAndCharts(); } catch (e) { console.error('updateAllCalculationsAndCharts error:', e); }
+  try { renderVideosFeed(); } catch (e) { console.error('renderVideosFeed error:', e); }
+  try { renderSavedVideosVault(); } catch (e) { console.error('renderSavedVideosVault error:', e); }
+  try { runLoopholeAudit(); } catch (e) { console.error('runLoopholeAudit error:', e); }
+  try { generateTimetable(); } catch (e) { console.error('generateTimetable error:', e); }
+  try { renderChatMessages(); } catch (e) { console.error('renderChatMessages error:', e); }
+  try { renderGoals(); } catch (e) { console.error('renderGoals error:', e); }
+  try { initMascot(); } catch (e) { console.error('initMascot error:', e); }
+  try { initRealtimeClock(); } catch (e) { console.error('initRealtimeClock error:', e); }
+  try { initPWAInstallPrompt(); } catch (e) { console.error('initPWAInstallPrompt error:', e); }
 });
 
 function loadAppData() {
@@ -356,44 +358,62 @@ function initRealtimeClock() {
 }
 
 // ==========================================
-// 5. VIEW NAVIGATION CONTROLLER
+// 5. VIEW NAVIGATION CONTROLLER (PRECISION ROUTING)
 // ==========================================
-function switchView(viewName) {
-  currentActiveView = viewName;
-  const viewSections = ['viewMatrix', 'viewAI', 'viewVideos', 'viewPlayer', 'viewVault', 'viewGoals'];
-  const tabButtons = ['tabBtnMatrix', 'tabBtnAI', 'tabBtnVideos', 'tabBtnPlayer', 'tabBtnVault', 'tabBtnGoals'];
-  const mobileButtons = ['mobTabMatrix', 'mobTabAI', 'mobTabVideos', 'mobTabPlayer', 'mobTabVault'];
+const VIEW_MAP = {
+  matrix: { viewId: 'viewMatrix', tabId: 'tabBtnMatrix', mobId: 'mobTabMatrix' },
+  ai: { viewId: 'viewAI', tabId: 'tabBtnAI', mobId: 'mobTabAI' },
+  videos: { viewId: 'viewVideos', tabId: 'tabBtnVideos', mobId: 'mobTabVideos' },
+  player: { viewId: 'viewPlayer', tabId: 'tabBtnPlayer', mobId: 'mobTabPlayer' },
+  vault: { viewId: 'viewVault', tabId: 'tabBtnVault', mobId: 'mobTabVault' },
+  goals: { viewId: 'viewGoals', tabId: 'tabBtnGoals', mobId: 'mobTabGoals' }
+};
 
-  viewSections.forEach(id => {
-    const el = document.getElementById(id);
+function switchView(viewName) {
+  if (!viewName) return;
+  const key = String(viewName).toLowerCase().trim();
+  const targetConfig = VIEW_MAP[key];
+  if (!targetConfig) {
+    console.warn('Unknown view name requested:', viewName);
+    return;
+  }
+  currentActiveView = key;
+
+  // 1. Hide all view sections
+  Object.values(VIEW_MAP).forEach(cfg => {
+    const el = document.getElementById(cfg.viewId);
     if (el) el.classList.add('hidden');
   });
 
-  tabButtons.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.className = "px-3.5 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5";
+  // 2. Reset desktop tab button styles
+  Object.values(VIEW_MAP).forEach(cfg => {
+    const btn = document.getElementById(cfg.tabId);
+    if (btn) {
+      btn.className = "px-3.5 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5";
     }
   });
 
-  mobileButtons.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.classList.remove('text-purple-400', 'font-bold');
-      el.classList.add('text-slate-400');
+  // 3. Reset mobile bottom navigation styles
+  Object.values(VIEW_MAP).forEach(cfg => {
+    const mob = document.getElementById(cfg.mobId);
+    if (mob) {
+      mob.classList.remove('text-purple-400', 'font-bold');
+      mob.classList.add('text-slate-400');
     }
   });
 
-  // Activate chosen view
-  const targetSection = document.getElementById(`view${capitalize(viewName)}`);
+  // 4. Activate chosen view section
+  const targetSection = document.getElementById(targetConfig.viewId);
   if (targetSection) targetSection.classList.remove('hidden');
 
-  const targetTab = document.getElementById(`tabBtn${capitalize(viewName)}`);
+  // 5. Highlight active desktop tab
+  const targetTab = document.getElementById(targetConfig.tabId);
   if (targetTab) {
     targetTab.className = "px-3.5 py-1.5 rounded-lg font-semibold bg-indigo-600 text-white transition-all flex items-center gap-1.5 shadow-md shadow-indigo-600/30";
   }
 
-  const targetMob = document.getElementById(`mobTab${capitalize(viewName)}`);
+  // 6. Highlight active mobile tab
+  const targetMob = document.getElementById(targetConfig.mobId);
   if (targetMob) {
     targetMob.classList.remove('text-slate-400');
     targetMob.classList.add('text-purple-400', 'font-bold');
@@ -401,21 +421,22 @@ function switchView(viewName) {
 
   soundFX.playTone(400, 0.05, 'sine', 0.04);
 
-  // Resize charts if opening matrix
-  if (viewName === 'matrix') {
+  // 7. Execute view-specific renderers
+  if (key === 'matrix') {
     setTimeout(() => {
-      Object.values(donutCharts).forEach(c => c && c.resize());
-      if (dailyTrendChartInstance) dailyTrendChartInstance.resize();
-      if (categoryBalanceChartInstance) categoryBalanceChartInstance.resize();
+      Object.values(donutCharts).forEach(c => c && typeof c.resize === 'function' && c.resize());
+      if (dailyTrendChartInstance && typeof dailyTrendChartInstance.resize === 'function') dailyTrendChartInstance.resize();
+      if (categoryBalanceChartInstance && typeof categoryBalanceChartInstance.resize === 'function') categoryBalanceChartInstance.resize();
     }, 60);
-  } else if (viewName === 'ai') {
+  } else if (key === 'ai') {
+    renderChatMessages();
     runLoopholeAudit();
     triggerMascotReaction('thinking', 'Astra AI ready. Ask me any question or request a custom schedule!');
-  } else if (viewName === 'vault') {
+  } else if (key === 'vault') {
     renderSavedVideosVault();
-  } else if (viewName === 'videos') {
+  } else if (key === 'videos') {
     renderVideosFeed();
-  } else if (viewName === 'goals') {
+  } else if (key === 'goals') {
     renderGoals();
   }
 }
@@ -876,6 +897,10 @@ function setElText(id, text) {
 }
 
 function initDonutCharts() {
+  if (typeof Chart === 'undefined') {
+    console.warn('Chart.js library is not available, skipping donut charts initialization.');
+    return;
+  }
   const keys = ['w1', 'w2', 'w3', 'w4', 'w5', 'totalMonth'];
   keys.forEach(k => {
     const canvas = document.getElementById(`${k}DonutChart`);
@@ -905,7 +930,7 @@ function initDonutCharts() {
 
 function updateDonutChart(key, done, remaining, accentColor) {
   const chart = donutCharts[key];
-  if (!chart) return;
+  if (!chart || typeof Chart === 'undefined') return;
   if (done === 0 && remaining === 0) remaining = 1;
 
   chart.data.datasets[0].data = [done, remaining];
@@ -914,6 +939,10 @@ function updateDonutChart(key, done, remaining, accentColor) {
 }
 
 function initSecondaryCharts() {
+  if (typeof Chart === 'undefined') {
+    console.warn('Chart.js library is not available, skipping secondary charts initialization.');
+    return;
+  }
   const bEl = document.getElementById('dailyTrendBarChart');
   if (bEl) {
     const bCtx = bEl.getContext('2d');
@@ -1133,7 +1162,7 @@ function renderChatMessages() {
   if (!container) return;
   container.innerHTML = '';
 
-  chatHistory.forEach(msg => {
+  chatHistory.forEach((msg, idx) => {
     const isUser = msg.role === 'user';
     const div = document.createElement('div');
     div.className = `flex gap-3 ${isUser ? 'justify-end' : 'justify-start'}`;
@@ -1151,7 +1180,7 @@ function renderChatMessages() {
         <div class="ai-prose text-xs sm:text-sm leading-relaxed">${formattedText}</div>
         ${!isUser && msg.timetableData ? `
           <div class="mt-3 pt-3 border-t border-white/10 flex flex-wrap gap-2">
-            <button onclick="injectAITasksToMatrixCustom(${JSON.stringify(msg.timetableData).replace(/"/g, '&quot;')})" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs flex items-center gap-1 shadow-md">
+            <button onclick="injectChatTimetable(${idx})" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs flex items-center gap-1 shadow-md">
               <i class="ph-bold ph-plus-circle"></i> Apply Timetable to My Habit Matrix
             </button>
           </div>
@@ -1169,6 +1198,13 @@ function renderChatMessages() {
   });
 
   container.scrollTop = container.scrollHeight;
+}
+
+function injectChatTimetable(chatIndex) {
+  const msg = chatHistory[chatIndex];
+  if (msg && msg.timetableData) {
+    injectAITasksToMatrixCustom(msg.timetableData);
+  }
 }
 
 function parseMarkdownSimple(text) {
@@ -1322,7 +1358,9 @@ async function callGeminiAPI(prompt, apiKey) {
 }
 
 function sendQuickPrompt(promptText) {
-  document.getElementById('chatInput').value = promptText;
+  switchView('ai');
+  const input = document.getElementById('chatInput');
+  if (input) input.value = promptText;
   handleSendMessage();
 }
 
@@ -1726,7 +1764,7 @@ function unlockVideoCheatNotes() {
   soundFX.unlockSound();
   triggerMascotReaction('cheering', `🎉 100% Watched! CheatNotes & Retention Flashcards Unlocked!`);
 
-  if (window.confetti) {
+  if (typeof confetti === 'function') {
     confetti({
       particleCount: 80,
       spread: 70,
@@ -1786,10 +1824,16 @@ function copyCheatNotes() {
   const cn = activePlayingVideo.cheatNotes;
   const text = `# CheatNotes: ${activePlayingVideo.title}\nSource: ${activePlayingVideo.channel}\n\n## Synopsis\n${cn.synopsis}\n\n## Core Principles\n${cn.principles.map(p => `- ${p}`).join('\n')}\n\n## Retention Flashcards\n${cn.flashcards.map(f => `Q: ${f.q}\nA: ${f.a}\n`).join('\n')}\n\n## Action Drill\n${cn.drill}`;
 
-  navigator.clipboard.writeText(text).then(() => {
-    soundFX.checkSound();
-    triggerMascotReaction('cheering', 'CheatNotes copied to clipboard!');
-  });
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      soundFX.checkSound();
+      triggerMascotReaction('cheering', 'CheatNotes copied to clipboard!');
+    }).catch(() => {
+      prompt('Copy your CheatNotes here:', text);
+    });
+  } else {
+    prompt('Copy your CheatNotes here:', text);
+  }
 }
 
 function downloadCheatNotesMarkdown() {
@@ -1984,4 +2028,51 @@ function triggerPWAInstall() {
 function closePwaBanner() {
   const banner = document.getElementById('pwaInstallBanner');
   if (banner) banner.classList.add('hidden');
+}
+
+// ==========================================
+// 14. EXPLICIT GLOBAL WINDOW EXPORTS
+// (Guarantees every inline button onclick/onchange works in all browser environments)
+// ==========================================
+if (typeof window !== 'undefined') {
+  window.switchView = switchView;
+  window.openAddHabitModal = openAddHabitModal;
+  window.closeAddHabitModal = closeAddHabitModal;
+  window.handleCreateHabit = handleCreateHabit;
+  window.openAddGoalModal = openAddGoalModal;
+  window.closeAddGoalModal = closeAddGoalModal;
+  window.handleCreateGoal = handleCreateGoal;
+  window.openAddVideoModal = openAddVideoModal;
+  window.closeAddVideoModal = closeAddVideoModal;
+  window.handleCreateCustomVideo = handleCreateCustomVideo;
+  window.openApiKeyModal = openApiKeyModal;
+  window.closeApiKeyModal = closeApiKeyModal;
+  window.saveApiKey = saveApiKey;
+  window.loadSamplePresets = loadSamplePresets;
+  window.changeCalendarMonth = changeCalendarMonth;
+  window.toggleCell = toggleCell;
+  window.updateHabitGoal = updateHabitGoal;
+  window.deleteHabit = deleteHabit;
+  window.interactWithMascot = interactWithMascot;
+  window.handleSendMessage = handleSendMessage;
+  window.sendQuickPrompt = sendQuickPrompt;
+  window.generateTimetable = generateTimetable;
+  window.injectAITasksToMatrix = injectAITasksToMatrix;
+  window.injectAITasksToMatrixCustom = injectAITasksToMatrixCustom;
+  window.injectChatTimetable = injectChatTimetable;
+  window.filterVideosByCategory = filterVideosByCategory;
+  window.shuffleVideoRecommendations = shuffleVideoRecommendations;
+  window.toggleSaveVideo = toggleSaveVideo;
+  window.openLecturePlayer = openLecturePlayer;
+  window.fastForwardWatchProgress = fastForwardWatchProgress;
+  window.copyCheatNotes = copyCheatNotes;
+  window.downloadCheatNotesMarkdown = downloadCheatNotesMarkdown;
+  window.addLectureToMatrixHabits = addLectureToMatrixHabits;
+  window.incrementGoal = incrementGoal;
+  window.removeGoal = removeGoal;
+  window.triggerPWAInstall = triggerPWAInstall;
+  window.closePwaBanner = closePwaBanner;
+  window.runLoopholeAudit = runLoopholeAudit;
+  window.renderMatrixTable = renderMatrixTable;
+  window.updateAllCalculationsAndCharts = updateAllCalculationsAndCharts;
 }

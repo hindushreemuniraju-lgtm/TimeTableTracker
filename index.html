@@ -155,9 +155,9 @@
     </div>
   </div>
 
-  <!-- DESKTOP SUB NAVIGATION BAR -->
-  <nav class="hidden lg:flex bg-brand-900/60 border-b border-white/5 px-4 sm:px-8 py-2 items-center justify-between sticky top-16 z-30 backdrop-blur-md">
-    <div class="flex items-center gap-1.5 overflow-x-auto text-xs">
+  <!-- MAIN APPLICATION NAVIGATION BAR (ACCESSIBLE ACROSS ALL SCREEN SIZES) -->
+  <nav class="flex bg-brand-900/70 border-b border-white/10 px-3 sm:px-6 py-2 items-center justify-between sticky top-16 z-30 backdrop-blur-md overflow-x-auto gap-2">
+    <div class="flex items-center gap-1.5 overflow-x-auto text-xs min-w-max">
       <button id="tabBtnMatrix" onclick="switchView('matrix')" class="px-3.5 py-1.5 rounded-lg font-semibold bg-indigo-600 text-white transition-all flex items-center gap-1.5 shadow-md shadow-indigo-600/30">
         <i class="ph-bold ph-grid-four"></i> 31-Day Matrix & Donut Charts
       </button>
@@ -180,7 +180,7 @@
     </div>
 
     <!-- Quick Stats -->
-    <div class="flex items-center gap-4 text-xs font-mono">
+    <div class="hidden xl:flex items-center gap-4 text-xs font-mono flex-shrink-0">
       <span class="text-slate-400">Target: <strong id="headerTotalGoal" class="text-white">180</strong></span>
       <span class="text-slate-400">Achieved: <strong id="headerTotalDone" class="text-emerald-400">92</strong></span>
       <span class="text-slate-400">Compliance: <strong id="headerTotalPct" class="text-purple-400">51.1%</strong></span>
@@ -1014,6 +1014,10 @@
       <i class="ph-bold ph-bookmark-simple text-lg"></i>
       <span>Vault</span>
       <span id="mobVaultCountBadge" class="absolute -top-1 -right-2 px-1 rounded-full text-[9px] bg-sky-500 text-white font-mono">0</span>
+    </button>
+    <button id="mobTabGoals" onclick="switchView('goals')" class="flex flex-col items-center gap-1 text-slate-400 transition-all">
+      <i class="ph-bold ph-target text-lg"></i>
+      <span>Goals</span>
     </button>
   </nav>
 
